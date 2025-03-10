@@ -20,10 +20,8 @@ using Il2CppInterop.Runtime.Runtime.VersionSpecific.MethodInfo;
 using Il2CppInterop.Runtime.Startup;
 using Microsoft.Extensions.Logging;
 
-namespace Il2CppInterop.Runtime.Injection
-{
-    internal static unsafe class InjectorHelpers
-    {
+namespace Il2CppInterop.Runtime.Injection {
+    internal static unsafe class InjectorHelpers {
         internal static Assembly Il2CppMscorlib = typeof(Il2CppSystem.Type).Assembly;
         internal static INativeAssemblyStruct InjectedAssembly;
         internal static INativeImageStruct InjectedImage;
@@ -48,8 +46,7 @@ namespace Il2CppInterop.Runtime.Injection
             [typeof(double)] = OpCodes.Stind_R8
         };
 
-        private static void CreateInjectedAssembly()
-        {
+        private static void CreateInjectedAssembly() {
             InjectedAssembly = UnityVersionHandler.NewAssembly();
             InjectedImage = UnityVersionHandler.NewImage();
 
@@ -69,8 +66,7 @@ namespace Il2CppInterop.Runtime.Injection
         private static readonly Class_FromName_Hook FromNameHook = new();
         private static readonly GarbageCollector_RunFinalizer_Patch RunFinalizerPatch = new();
 
-        internal static void Setup()
-        {
+        internal static void Setup() {
             if (InjectedAssembly == null) CreateInjectedAssembly();
             GenericMethodGetMethodHook.ApplyHook();
             GetTypeInfoFromTypeDefinitionIndexHook.ApplyHook();
@@ -81,44 +77,37 @@ namespace Il2CppInterop.Runtime.Injection
             RunFinalizerPatch.ApplyHook();
         }
 
-        internal static long CreateClassToken(IntPtr classPointer)
-        {
+        internal static long CreateClassToken(IntPtr classPointer) {
             long newToken = Interlocked.Decrement(ref s_LastInjectedToken);
             s_InjectedClasses[newToken] = classPointer;
             return newToken;
         }
 
         internal static void AddTypeToLookup<T>(IntPtr typePointer) where T : class => AddTypeToLookup(typeof(T), typePointer);
-        internal static void AddTypeToLookup(Type type, IntPtr typePointer)
-        {
+        internal static void AddTypeToLookup(Type type, IntPtr typePointer) {
             string klass = type.Name;
             if (klass == null) return;
             string namespaze = type.Namespace ?? string.Empty;
             var attribute = Attribute.GetCustomAttribute(type, typeof(Il2CppInterop.Runtime.Attributes.ClassInjectionAssemblyTargetAttribute)) as Il2CppInterop.Runtime.Attributes.ClassInjectionAssemblyTargetAttribute;
 
-            foreach (IntPtr image in (attribute is null) ? IL2CPP.GetIl2CppImages() : attribute.GetImagePointers())
-            {
+            foreach (IntPtr image in (attribute is null) ? IL2CPP.GetIl2CppImages() : attribute.GetImagePointers()) {
                 s_ClassNameLookup.Add((namespaze, klass, image), typePointer);
             }
         }
 
-        internal static IntPtr GetIl2CppExport(string name)
-        {
-            if (!TryGetIl2CppExport(name, out var address))
-            {
+        internal static IntPtr GetIl2CppExport(string name) {
+            if (!TryGetIl2CppExport(name, out var address)) {
                 throw new NotSupportedException($"Couldn't find {name} in {Il2CppModule.ModuleName}'s exports");
             }
 
             return address;
         }
 
-        internal static bool TryGetIl2CppExport(string name, out IntPtr address)
-        {
+        internal static bool TryGetIl2CppExport(string name, out IntPtr address) {
             return NativeLibrary.TryGetExport(Il2CppHandle, name, out address);
         }
 
-        internal static IntPtr GetIl2CppMethodPointer(MethodBase proxyMethod)
-        {
+        internal static IntPtr GetIl2CppMethodPointer(MethodBase proxyMethod) {
             if (proxyMethod == null) return IntPtr.Zero;
 
             FieldInfo methodInfoPointerField = Il2CppInteropUtils.GetIl2CppMethodInfoPointerFieldForGeneratedMethod(proxyMethod);
@@ -161,22 +150,17 @@ namespace Il2CppInterop.Runtime.Injection
             }
         };
 
-        private static d_ClassInit FindClassInit()
-        {
-            static nint GetClassInitSubstitute()
-            {
-                if (TryGetIl2CppExport("mono_class_instance_size", out nint classInit))
-                {
+        private static d_ClassInit FindClassInit() {
+            static nint GetClassInitSubstitute() {
+                if (TryGetIl2CppExport("mono_class_instance_size", out nint classInit)) {
                     Logger.Instance.LogTrace("Picked mono_class_instance_size as a Class::Init substitute");
                     return classInit;
                 }
-                if (TryGetIl2CppExport("mono_class_setup_vtable", out classInit))
-                {
+                if (TryGetIl2CppExport("mono_class_setup_vtable", out classInit)) {
                     Logger.Instance.LogTrace("Picked mono_class_setup_vtable as a Class::Init substitute");
                     return classInit;
                 }
-                if (TryGetIl2CppExport(nameof(IL2CPP.il2cpp_class_has_references), out classInit))
-                {
+                if (TryGetIl2CppExport(nameof(IL2CPP.il2cpp_class_has_references), out classInit)) {
                     Logger.Instance.LogTrace("Picked il2cpp_class_has_references as a Class::Init substitute");
                     return classInit;
                 }
@@ -188,8 +172,7 @@ namespace Il2CppInterop.Runtime.Injection
                 .Select(s => MemoryUtils.FindSignatureInModule(Il2CppModule, s))
                 .FirstOrDefault(p => p != 0);
 
-            if (pClassInit == 0)
-            {
+            if (pClassInit == 0) {
                 Logger.Instance.LogWarning("Class::Init signatures have been exhausted, using a substitute!");
                 pClassInit = GetClassInitSubstitute();
             }

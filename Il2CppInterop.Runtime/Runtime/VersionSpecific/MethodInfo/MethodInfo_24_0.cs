@@ -1,25 +1,20 @@
 using System;
 using System.Runtime.InteropServices;
-namespace Il2CppInterop.Runtime.Runtime.VersionSpecific.MethodInfo
-{
+namespace Il2CppInterop.Runtime.Runtime.VersionSpecific.MethodInfo {
     [ApplicableToUnityVersionsSince("2018.1.0")]
-    public unsafe class NativeMethodInfoStructHandler_24_0 : INativeMethodInfoStructHandler
-    {
+    public unsafe class NativeMethodInfoStructHandler_24_0 : INativeMethodInfoStructHandler {
         public int Size() => sizeof(Il2CppMethodInfo_24_0);
-        public INativeMethodInfoStruct CreateNewStruct()
-        {
+        public INativeMethodInfoStruct CreateNewStruct() {
             IntPtr ptr = Marshal.AllocHGlobal(Size());
             Il2CppMethodInfo_24_0* _ = (Il2CppMethodInfo_24_0*)ptr;
             *_ = default;
             return new NativeStructWrapper(ptr);
         }
-        public INativeMethodInfoStruct Wrap(Il2CppMethodInfo* ptr)
-        {
+        public INativeMethodInfoStruct? Wrap(Il2CppMethodInfo* ptr) {
             if (ptr == null) return null;
             return new NativeStructWrapper((IntPtr)ptr);
         }
-        internal unsafe struct Il2CppMethodInfo_24_0
-        {
+        internal unsafe struct Il2CppMethodInfo_24_0 {
             public void* methodPointer;
             public void* invoker_method;
             public byte* name;
@@ -35,8 +30,7 @@ namespace Il2CppInterop.Runtime.Runtime.VersionSpecific.MethodInfo
             public ushort slot;
             public byte parameters_count;
             public Bitfield0 _bitfield0;
-            internal enum Bitfield0 : byte
-            {
+            internal enum Bitfield0 : byte {
                 BIT_is_generic = 0,
                 is_generic = (1 << BIT_is_generic),
                 BIT_is_inflated = 1,
@@ -49,8 +43,7 @@ namespace Il2CppInterop.Runtime.Runtime.VersionSpecific.MethodInfo
 
         }
 
-        internal class NativeStructWrapper : INativeMethodInfoStruct
-        {
+        internal class NativeStructWrapper : INativeMethodInfoStruct {
             public NativeStructWrapper(IntPtr ptr) => Pointer = ptr;
             private static int _bitfield0offset = Marshal.OffsetOf<Il2CppMethodInfo_24_0>(nameof(Il2CppMethodInfo_24_0._bitfield0)).ToInt32();
             public IntPtr Pointer { get; }

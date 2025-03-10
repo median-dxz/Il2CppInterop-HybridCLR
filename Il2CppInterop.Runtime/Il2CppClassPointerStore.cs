@@ -8,10 +8,8 @@ using Void = Il2CppSystem.Void;
 
 namespace Il2CppInterop.Runtime;
 
-public static class Il2CppClassPointerStore
-{
-    public static IntPtr GetNativeClassPointer(Type type)
-    {
+public static class Il2CppClassPointerStore {
+    public static IntPtr GetNativeClassPointer(Type type) {
         if (type == typeof(void)) return Il2CppClassPointerStore<Void>.NativeClassPtr;
         if (type == typeof(String)) return Il2CppClassPointerStore<string>.NativeClassPtr;
         return (IntPtr)typeof(Il2CppClassPointerStore<>)
@@ -20,8 +18,7 @@ public static class Il2CppClassPointerStore
             .GetValue(null);
     }
 
-    internal static void SetNativeClassPointer(Type type, IntPtr value)
-    {
+    internal static void SetNativeClassPointer(Type type, IntPtr value) {
         typeof(Il2CppClassPointerStore<>)
             .MakeGenericType(type)
             .GetField(nameof(Il2CppClassPointerStore<int>.NativeClassPtr))
@@ -29,25 +26,19 @@ public static class Il2CppClassPointerStore
     }
 }
 
-public static class Il2CppClassPointerStore<T>
-{
+public static class Il2CppClassPointerStore<T> {
     public static IntPtr NativeClassPtr;
     public static Type CreatedTypeRedirect;
 
-    static Il2CppClassPointerStore()
-    {
+    static Il2CppClassPointerStore() {
         var targetType = typeof(T);
-        if (!targetType.IsEnum)
-        {
+        if (!targetType.IsEnum) {
             RuntimeHelpers.RunClassConstructor(targetType.TypeHandle);
-        }
-        else
-        {
+        } else {
             var assemblyName = targetType.Module.Name;
             var @namespace = targetType.Namespace ?? "";
             var name = targetType.Name;
-            foreach (var customAttribute in targetType.CustomAttributes)
-            {
+            foreach (var customAttribute in targetType.CustomAttributes) {
                 if (customAttribute.AttributeType != typeof(OriginalNameAttribute)) continue;
                 assemblyName = (string)customAttribute.ConstructorArguments[0].Value;
                 @namespace = (string)customAttribute.ConstructorArguments[1].Value;
@@ -68,8 +59,7 @@ public static class Il2CppClassPointerStore<T>
                 .Single(it => it.GetName().Name == "Il2Cppmscorlib").GetType("Il2Cpp" + targetType.FullName)
                 .TypeHandle);
 
-        foreach (var customAttribute in targetType.CustomAttributes)
-        {
+        foreach (var customAttribute in targetType.CustomAttributes) {
             if (customAttribute.AttributeType != typeof(AlsoInitializeAttribute)) continue;
 
             var linkedType = (Type)customAttribute.ConstructorArguments[0].Value;

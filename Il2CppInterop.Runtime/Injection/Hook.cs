@@ -3,14 +3,12 @@ using System.Runtime.InteropServices;
 using Il2CppInterop.Common;
 using Microsoft.Extensions.Logging;
 
-namespace Il2CppInterop.Runtime.Injection
-{
-    internal abstract class Hook<T> where T : Delegate
-    {
+namespace Il2CppInterop.Runtime.Injection {
+    internal abstract class Hook<T> where T : Delegate {
         private bool _isApplied;
-        private T _detour;
-        private T _method;
-        private T _original;
+        private T? _detour;
+        private T? _method;
+        private T? _original;
 
         public T Original => _original;
 
@@ -18,19 +16,16 @@ namespace Il2CppInterop.Runtime.Injection
         public abstract T GetDetour();
         public abstract IntPtr FindTargetMethod();
 
-        public virtual void TargetMethodNotFound()
-        {
+        public virtual void TargetMethodNotFound() {
             throw new Exception($"Required target method {TargetMethodName} not found");
         }
 
-        public void ApplyHook()
-        {
+        public void ApplyHook() {
             if (_isApplied) return;
 
             var methodPtr = FindTargetMethod();
 
-            if (methodPtr == IntPtr.Zero)
-            {
+            if (methodPtr == IntPtr.Zero) {
                 TargetMethodNotFound();
                 return;
             }

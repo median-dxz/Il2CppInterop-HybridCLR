@@ -2,14 +2,12 @@
 
 namespace Il2CppInterop.Runtime.Runtime.VersionSpecific.Type;
 
-public interface INativeTypeStructHandler : INativeStructHandler
-{
+public interface INativeTypeStructHandler : INativeStructHandler {
     INativeTypeStruct CreateNewStruct();
     unsafe INativeTypeStruct Wrap(Il2CppTypeStruct* typePointer);
 }
 
-public interface INativeTypeStruct : INativeStruct
-{
+public interface INativeTypeStruct : INativeStruct {
     unsafe Il2CppTypeStruct* TypePointer { get; }
 
     ref IntPtr Data { get; }

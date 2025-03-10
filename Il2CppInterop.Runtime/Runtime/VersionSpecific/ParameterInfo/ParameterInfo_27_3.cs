@@ -4,20 +4,16 @@ using System.Runtime.InteropServices;
 namespace Il2CppInterop.Runtime.Runtime.VersionSpecific.ParameterInfo;
 
 [ApplicableToUnityVersionsSince("2021.2.0")]
-internal class NativeParameterInfoStructHandler_27_3 : INativeParameterInfoStructHandler
-{
-    public unsafe int Size()
-    {
+internal class NativeParameterInfoStructHandler_27_3 : INativeParameterInfoStructHandler {
+    public unsafe int Size() {
         return sizeof(Il2CppParameterInfo_27_3);
     }
 
-    public unsafe Il2CppParameterInfo*[] CreateNewParameterInfoArray(int paramCount)
-    {
+    public unsafe Il2CppParameterInfo*[] CreateNewParameterInfoArray(int paramCount) {
         var ptr = (Il2CppParameterInfo_27_3*)Marshal.AllocHGlobal(Marshal.SizeOf<Il2CppParameterInfo_27_3>() *
                                                                    paramCount);
         var res = new Il2CppParameterInfo*[paramCount];
-        for (var i = 0; i < paramCount; i++)
-        {
+        for (var i = 0; i < paramCount; i++) {
             ptr[i] = default;
             res[i] = (Il2CppParameterInfo*)&ptr[i];
         }
@@ -25,14 +21,12 @@ internal class NativeParameterInfoStructHandler_27_3 : INativeParameterInfoStruc
         return res;
     }
 
-    public unsafe INativeParameterInfoStruct? Wrap(Il2CppParameterInfo* paramInfoPointer)
-    {
+    public unsafe INativeParameterInfoStruct? Wrap(Il2CppParameterInfo* paramInfoPointer) {
         if ((IntPtr)paramInfoPointer == IntPtr.Zero) return null;
         return new NativeParameterInfoStructWrapper((IntPtr)paramInfoPointer);
     }
 
-    public unsafe INativeParameterInfoStruct? Wrap(Il2CppParameterInfo* paramInfoListBegin, int index)
-    {
+    public unsafe INativeParameterInfoStruct? Wrap(Il2CppParameterInfo* paramInfoListBegin, int index) {
         if ((IntPtr)paramInfoListBegin == IntPtr.Zero) return null;
         return new NativeParameterInfoStructWrapper((IntPtr)paramInfoListBegin +
                                                     Marshal.SizeOf<Il2CppParameterInfo_27_3>() * index);
@@ -46,15 +40,12 @@ internal class NativeParameterInfoStructHandler_27_3 : INativeParameterInfoStruc
 
     //Doesn't actually exist; just using this for type pointer storage in MethodInfo 27_3 +
     [StructLayout(LayoutKind.Sequential)]
-    internal unsafe struct Il2CppParameterInfo_27_3
-    {
+    internal unsafe struct Il2CppParameterInfo_27_3 {
         public Il2CppTypeStruct* parameter_type;
     }
 
-    internal unsafe class NativeParameterInfoStructWrapper : INativeParameterInfoStruct
-    {
-        public NativeParameterInfoStructWrapper(IntPtr pointer)
-        {
+    internal unsafe class NativeParameterInfoStructWrapper : INativeParameterInfoStruct {
+        public NativeParameterInfoStructWrapper(IntPtr pointer) {
             Pointer = pointer;
         }
 

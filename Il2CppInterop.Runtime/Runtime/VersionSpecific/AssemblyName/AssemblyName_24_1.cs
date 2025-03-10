@@ -1,25 +1,20 @@
 using System;
 using System.Runtime.InteropServices;
-namespace Il2CppInterop.Runtime.Runtime.VersionSpecific.AssemblyName
-{
+namespace Il2CppInterop.Runtime.Runtime.VersionSpecific.AssemblyName {
     [ApplicableToUnityVersionsSince("2018.4.34")]
-    public unsafe class NativeAssemblyNameStructHandler_24_1 : INativeAssemblyNameStructHandler
-    {
+    public unsafe class NativeAssemblyNameStructHandler_24_1 : INativeAssemblyNameStructHandler {
         public int Size() => sizeof(Il2CppAssemblyName_24_1);
-        public INativeAssemblyNameStruct CreateNewStruct()
-        {
+        public INativeAssemblyNameStruct CreateNewStruct() {
             IntPtr ptr = Marshal.AllocHGlobal(Size());
             Il2CppAssemblyName_24_1* _ = (Il2CppAssemblyName_24_1*)ptr;
             *_ = default;
             return new NativeStructWrapper(ptr);
         }
-        public INativeAssemblyNameStruct Wrap(Il2CppAssemblyName* ptr)
-        {
+        public INativeAssemblyNameStruct? Wrap(Il2CppAssemblyName* ptr) {
             if (ptr == null) return null;
             return new NativeStructWrapper((IntPtr)ptr);
         }
-        internal unsafe struct Il2CppAssemblyName_24_1
-        {
+        internal unsafe struct Il2CppAssemblyName_24_1 {
             public byte* name;
             public byte* culture;
             public byte* public_key;
@@ -33,8 +28,7 @@ namespace Il2CppInterop.Runtime.Runtime.VersionSpecific.AssemblyName
             public ulong public_key_token;
         }
 
-        internal class NativeStructWrapper : INativeAssemblyNameStruct
-        {
+        internal class NativeStructWrapper : INativeAssemblyNameStruct {
             public NativeStructWrapper(IntPtr ptr) => Pointer = ptr;
             public IntPtr Pointer { get; }
             private Il2CppAssemblyName_24_1* _ => (Il2CppAssemblyName_24_1*)Pointer;

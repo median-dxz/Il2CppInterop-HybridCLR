@@ -2,14 +2,12 @@
 
 namespace Il2CppInterop.Runtime.Runtime.VersionSpecific.AssemblyName;
 
-public interface INativeAssemblyNameStructHandler : INativeStructHandler
-{
+public interface INativeAssemblyNameStructHandler : INativeStructHandler {
     INativeAssemblyNameStruct CreateNewStruct();
     unsafe INativeAssemblyNameStruct Wrap(Il2CppAssemblyName* assemblyNamePointer);
 }
 
-public interface INativeAssemblyNameStruct : INativeStruct
-{
+public interface INativeAssemblyNameStruct : INativeStruct {
     unsafe Il2CppAssemblyName* AssemblyNamePointer { get; }
     ref IntPtr Name { get; }
     ref IntPtr Culture { get; }

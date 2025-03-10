@@ -2,14 +2,12 @@ using System;
 
 namespace Il2CppInterop.Runtime.Runtime.VersionSpecific.Image;
 
-public interface INativeImageStructHandler : INativeStructHandler
-{
+public interface INativeImageStructHandler : INativeStructHandler {
     INativeImageStruct CreateNewStruct();
     unsafe INativeImageStruct Wrap(Il2CppImage* imagePointer);
 }
 
-public interface INativeImageStruct : INativeStruct
-{
+public interface INativeImageStruct : INativeStruct {
     unsafe Il2CppImage* ImagePointer { get; }
 
     unsafe ref Il2CppAssembly* Assembly { get; }

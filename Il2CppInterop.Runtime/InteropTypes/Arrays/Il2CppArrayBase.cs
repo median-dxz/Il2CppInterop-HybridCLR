@@ -6,10 +6,8 @@ using Il2CppInterop.Runtime.Runtime;
 
 namespace Il2CppInterop.Runtime.InteropTypes.Arrays;
 
-public abstract class Il2CppArrayBase : Il2CppObjectBase, IEnumerable
-{
-    protected Il2CppArrayBase(IntPtr pointer) : base(pointer)
-    {
+public abstract class Il2CppArrayBase : Il2CppObjectBase, IEnumerable {
+    protected Il2CppArrayBase(IntPtr pointer) : base(pointer) {
     }
 
     /// <summary>
@@ -21,46 +19,37 @@ public abstract class Il2CppArrayBase : Il2CppObjectBase, IEnumerable
 
     public abstract IEnumerator GetEnumerator();
 
-    private protected static bool ThrowImmutableLength()
-    {
+    private protected static bool ThrowImmutableLength() {
         throw new NotSupportedException("Arrays have immutable length");
     }
 
-    private protected void ThrowIfIndexOutOfRange(int index)
-    {
+    private protected void ThrowIfIndexOutOfRange(int index) {
         if ((uint)index >= (uint)Length)
             throw new ArgumentOutOfRangeException(nameof(index),
                 "Array index may not be negative or above length of the array");
     }
 }
-public abstract class Il2CppArrayBase<T> : Il2CppArrayBase, IList<T>, IReadOnlyList<T>
-{
-    protected Il2CppArrayBase(IntPtr pointer) : base(pointer)
-    {
+public abstract class Il2CppArrayBase<T> : Il2CppArrayBase, IList<T>, IReadOnlyList<T> {
+    protected Il2CppArrayBase(IntPtr pointer) : base(pointer) {
     }
 
-    public sealed override IEnumerator<T> GetEnumerator()
-    {
+    public sealed override IEnumerator<T> GetEnumerator() {
         return new IndexEnumerator(this);
     }
 
-    void ICollection<T>.Add(T item)
-    {
+    void ICollection<T>.Add(T item) {
         ThrowImmutableLength();
     }
 
-    void ICollection<T>.Clear()
-    {
+    void ICollection<T>.Clear() {
         ThrowImmutableLength();
     }
 
-    public bool Contains(T item)
-    {
+    public bool Contains(T item) {
         return IndexOf(item) != -1;
     }
 
-    public void CopyTo(T[] array, int arrayIndex)
-    {
+    public void CopyTo(T[] array, int arrayIndex) {
         if (array == null) throw new ArgumentNullException(nameof(array));
         if (arrayIndex < 0) throw new ArgumentOutOfRangeException(nameof(arrayIndex));
         if (array.Length - arrayIndex < Length)
@@ -71,8 +60,7 @@ public abstract class Il2CppArrayBase<T> : Il2CppArrayBase, IList<T>, IReadOnlyL
             array[i + arrayIndex] = this[i];
     }
 
-    bool ICollection<T>.Remove(T item)
-    {
+    bool ICollection<T>.Remove(T item) {
         return ThrowImmutableLength();
     }
 
@@ -80,8 +68,7 @@ public abstract class Il2CppArrayBase<T> : Il2CppArrayBase, IList<T>, IReadOnlyL
     public int Count => Length;
     bool ICollection<T>.IsReadOnly => false;
 
-    public int IndexOf(T item)
-    {
+    public int IndexOf(T item) {
         for (var i = 0; i < Length; i++)
             if (Equals(item, this[i]))
                 return i;
@@ -89,20 +76,17 @@ public abstract class Il2CppArrayBase<T> : Il2CppArrayBase, IList<T>, IReadOnlyL
         return -1;
     }
 
-    void IList<T>.Insert(int index, T item)
-    {
+    void IList<T>.Insert(int index, T item) {
         ThrowImmutableLength();
     }
 
-    void IList<T>.RemoveAt(int index)
-    {
+    void IList<T>.RemoveAt(int index) {
         ThrowImmutableLength();
     }
 
     public abstract T this[int index] { get; set; }
 
-    protected static void StaticCtorBody(Type ownType)
-    {
+    protected static void StaticCtorBody(Type ownType) {
         var nativeClassPtr = Il2CppClassPointerStore<T>.NativeClassPtr;
         if (nativeClassPtr == IntPtr.Zero)
             return;
@@ -117,8 +101,7 @@ public abstract class Il2CppArrayBase<T> : Il2CppArrayBase, IList<T>, IReadOnlyL
     }
 
     [return: NotNullIfNotNull(nameof(il2CppArray))]
-    public static implicit operator T[]?(Il2CppArrayBase<T>? il2CppArray)
-    {
+    public static implicit operator T[]?(Il2CppArrayBase<T>? il2CppArray) {
         if (il2CppArray == null)
             return null;
 
@@ -129,8 +112,7 @@ public abstract class Il2CppArrayBase<T> : Il2CppArrayBase, IList<T>, IReadOnlyL
         return arr;
     }
 
-    public static Il2CppArrayBase<T>? WrapNativeGenericArrayPointer(IntPtr pointer)
-    {
+    public static Il2CppArrayBase<T>? WrapNativeGenericArrayPointer(IntPtr pointer) {
         if (pointer == IntPtr.Zero) return null;
 
         if (typeof(T) == typeof(string))
@@ -146,28 +128,23 @@ public abstract class Il2CppArrayBase<T> : Il2CppArrayBase, IList<T>, IReadOnlyL
             $"{typeof(T)} is not a value type, not a string and not an IL2CPP object; it can't be used in IL2CPP arrays");
     }
 
-    private class IndexEnumerator : IEnumerator<T>
-    {
+    private class IndexEnumerator : IEnumerator<T> {
         private Il2CppArrayBase<T> myArray;
         private int myIndex = -1;
 
-        public IndexEnumerator(Il2CppArrayBase<T> array)
-        {
+        public IndexEnumerator(Il2CppArrayBase<T> array) {
             myArray = array;
         }
 
-        public void Dispose()
-        {
+        public void Dispose() {
             myArray = null!;
         }
 
-        public bool MoveNext()
-        {
+        public bool MoveNext() {
             return ++myIndex < myArray.Count;
         }
 
-        public void Reset()
-        {
+        public void Reset() {
             myIndex = -1;
         }
 

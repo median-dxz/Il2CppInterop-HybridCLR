@@ -21,18 +21,15 @@ using Microsoft.Extensions.Logging;
 namespace Il2CppInterop.Runtime.Runtime;
 
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = false)]
-internal class ApplicableToUnityVersionsSinceAttribute : Attribute
-{
-    public ApplicableToUnityVersionsSinceAttribute(string startVersion)
-    {
+internal class ApplicableToUnityVersionsSinceAttribute : Attribute {
+    public ApplicableToUnityVersionsSinceAttribute(string startVersion) {
         StartVersion = startVersion;
     }
 
     public string StartVersion { get; }
 }
 
-public static class UnityVersionHandler
-{
+public static class UnityVersionHandler {
     private static readonly Type[] InterfacesOfInterest;
     private static readonly Dictionary<Type, List<(Version Version, object Handler)>> VersionedHandlers = new();
     private static readonly Dictionary<Type, object> Handlers = new();
@@ -49,8 +46,7 @@ public static class UnityVersionHandler
     internal static INativePropertyInfoStructHandler propertyInfoStructHandler;
     internal static INativeTypeStructHandler typeStructHandler;
 
-    static UnityVersionHandler()
-    {
+    static UnityVersionHandler() {
         var allTypes = GetAllTypesSafe();
         var interfacesOfInterest = allTypes.Where(t =>
                 t.IsInterface && typeof(INativeStructHandler).IsAssignableFrom(t) && t != typeof(INativeStructHandler))
@@ -61,8 +57,7 @@ public static class UnityVersionHandler
 
         foreach (var handlerImpl in allTypes.Where(t =>
                      !t.IsAbstract && interfacesOfInterest.Any(i => i.IsAssignableFrom(t))))
-            foreach (var startVersion in handlerImpl.GetCustomAttributes<ApplicableToUnityVersionsSinceAttribute>())
-            {
+            foreach (var startVersion in handlerImpl.GetCustomAttributes<ApplicableToUnityVersionsSinceAttribute>()) {
                 var instance = Activator.CreateInstance(handlerImpl);
                 foreach (var i in handlerImpl.GetInterfaces())
                     if (interfacesOfInterest.Contains(i))
@@ -82,14 +77,12 @@ public static class UnityVersionHandler
     // Version since which extra_arg is set to invoke_multicast, necessitating constructor calls
     public static bool MustUseDelegateConstructor => IsMetadataV29OrHigher;
 
-    internal static void RecalculateHandlers()
-    {
+    internal static void RecalculateHandlers() {
         Handlers.Clear();
         var unityVersion = Il2CppInteropRuntime.Instance.UnityVersion;
 
         foreach (var type in InterfacesOfInterest)
-            foreach (var valueTuple in VersionedHandlers[type])
-            {
+            foreach (var valueTuple in VersionedHandlers[type]) {
                 if (valueTuple.Version > unityVersion) continue;
 
                 Handlers[type] = valueTuple.Handler;
@@ -114,8 +107,7 @@ public static class UnityVersionHandler
         typeStructHandler = GetHandler<INativeTypeStructHandler>();
     }
 
-    private static T GetHandler<T>()
-    {
+    private static T GetHandler<T>() {
         if (Handlers.TryGetValue(typeof(T), out var result))
             return (T)result;
 
@@ -124,191 +116,156 @@ public static class UnityVersionHandler
         throw new ApplicationException("No handler");
     }
 
-    private static Type[] GetAllTypesSafe()
-    {
+    private static Type[] GetAllTypesSafe() {
         return typeof(UnityVersionHandler).Assembly.GetTypesSafe();
     }
 
     //Assemblies
-    public static INativeAssemblyStruct NewAssembly()
-    {
+    public static INativeAssemblyStruct NewAssembly() {
         return assemblyStructHandler.CreateNewStruct();
     }
 
-    public static unsafe INativeAssemblyStruct Wrap(Il2CppAssembly* assemblyPointer)
-    {
+    public static unsafe INativeAssemblyStruct Wrap(Il2CppAssembly* assemblyPointer) {
         return assemblyStructHandler.Wrap(assemblyPointer);
     }
 
-    public static int AssemblySize()
-    {
+    public static int AssemblySize() {
         return assemblyStructHandler.Size();
     }
 
     //Assembly Names
-    public static INativeAssemblyNameStruct NewAssemblyName()
-    {
+    public static INativeAssemblyNameStruct NewAssemblyName() {
         return assemblyNameStructHandler.CreateNewStruct();
     }
 
-    public static unsafe INativeAssemblyNameStruct Wrap(Il2CppAssemblyName* assemblyNamePointer)
-    {
+    public static unsafe INativeAssemblyNameStruct Wrap(Il2CppAssemblyName* assemblyNamePointer) {
         return assemblyNameStructHandler.Wrap(assemblyNamePointer);
     }
 
-    public static int AssemblyNameSize()
-    {
+    public static int AssemblyNameSize() {
         return assemblyNameStructHandler.Size();
     }
 
     //Classes
-    public static INativeClassStruct NewClass(int vTableSlots)
-    {
+    public static INativeClassStruct NewClass(int vTableSlots) {
         return classStructHandler.CreateNewStruct(vTableSlots);
     }
 
-    public static unsafe INativeClassStruct Wrap(Il2CppClass* classPointer)
-    {
+    public static unsafe INativeClassStruct Wrap(Il2CppClass* classPointer) {
         return classStructHandler.Wrap(classPointer);
     }
 
-    public static int ClassSize()
-    {
+    public static int ClassSize() {
         return classStructHandler.Size();
     }
 
     //Events
-    public static INativeEventInfoStruct NewEvent()
-    {
+    public static INativeEventInfoStruct NewEvent() {
         return eventInfoStructHandler.CreateNewStruct();
     }
 
-    public static unsafe INativeEventInfoStruct Wrap(Il2CppEventInfo* eventInfoPointer)
-    {
+    public static unsafe INativeEventInfoStruct Wrap(Il2CppEventInfo* eventInfoPointer) {
         return eventInfoStructHandler.Wrap(eventInfoPointer);
     }
 
-    public static int EventSize()
-    {
+    public static int EventSize() {
         return eventInfoStructHandler.Size();
     }
 
     //Exceptions
-    public static INativeExceptionStruct NewException()
-    {
+    public static INativeExceptionStruct NewException() {
         return exceptionStructHandler.CreateNewStruct();
     }
 
-    public static unsafe INativeExceptionStruct Wrap(Il2CppException* exceptionPointer)
-    {
+    public static unsafe INativeExceptionStruct Wrap(Il2CppException* exceptionPointer) {
         return exceptionStructHandler.Wrap(exceptionPointer);
     }
 
-    public static int ExceptionSize()
-    {
+    public static int ExceptionSize() {
         return exceptionStructHandler.Size();
     }
 
     //Fields
-    public static INativeFieldInfoStruct NewField()
-    {
+    public static INativeFieldInfoStruct NewField() {
         return fieldInfoStructHandler.CreateNewStruct();
     }
 
-    public static unsafe INativeFieldInfoStruct Wrap(Il2CppFieldInfo* fieldInfoPointer)
-    {
+    public static unsafe INativeFieldInfoStruct Wrap(Il2CppFieldInfo* fieldInfoPointer) {
         return fieldInfoStructHandler.Wrap(fieldInfoPointer);
     }
 
-    public static int FieldInfoSize()
-    {
+    public static int FieldInfoSize() {
         return fieldInfoStructHandler.Size();
     }
 
 
     //Images
-    public static INativeImageStruct NewImage()
-    {
+    public static INativeImageStruct NewImage() {
         return imageStructHandler.CreateNewStruct();
     }
 
-    public static unsafe INativeImageStruct Wrap(Il2CppImage* imagePointer)
-    {
+    public static unsafe INativeImageStruct Wrap(Il2CppImage* imagePointer) {
         return imageStructHandler.Wrap(imagePointer);
     }
 
-    public static int ImageSize()
-    {
+    public static int ImageSize() {
         return imageStructHandler.Size();
     }
 
     //Methods
-    public static INativeMethodInfoStruct NewMethod()
-    {
+    public static INativeMethodInfoStruct NewMethod() {
         return methodInfoStructHandler.CreateNewStruct();
     }
 
-    public static unsafe INativeMethodInfoStruct Wrap(Il2CppMethodInfo* methodPointer)
-    {
+    public static unsafe INativeMethodInfoStruct Wrap(Il2CppMethodInfo* methodPointer) {
         return methodInfoStructHandler.Wrap(methodPointer);
     }
 
-    public static int MethodSize()
-    {
+    public static int MethodSize() {
         return methodInfoStructHandler.Size();
     }
 
     //Parameters
-    public static unsafe Il2CppParameterInfo*[] NewMethodParameterArray(int count)
-    {
+    public static unsafe Il2CppParameterInfo*[] NewMethodParameterArray(int count) {
         return parameterInfoStructHandler.CreateNewParameterInfoArray(count);
     }
 
-    public static unsafe INativeParameterInfoStruct Wrap(Il2CppParameterInfo* parameterInfo)
-    {
+    public static unsafe INativeParameterInfoStruct Wrap(Il2CppParameterInfo* parameterInfo) {
         return parameterInfoStructHandler.Wrap(parameterInfo);
     }
 
-    public static unsafe INativeParameterInfoStruct Wrap(Il2CppParameterInfo* parameterInfo, int index)
-    {
+    public static unsafe INativeParameterInfoStruct Wrap(Il2CppParameterInfo* parameterInfo, int index) {
         return parameterInfoStructHandler.Wrap(parameterInfo, index);
     }
 
-    public static bool ParameterInfoHasNamePosToken()
-    {
+    public static bool ParameterInfoHasNamePosToken() {
         return parameterInfoStructHandler.HasNamePosToken;
     }
 
 
     //Properties
-    public static INativePropertyInfoStruct NewProperty()
-    {
+    public static INativePropertyInfoStruct NewProperty() {
         return propertyInfoStructHandler.CreateNewStruct();
     }
 
-    public static unsafe INativePropertyInfoStruct Wrap(Il2CppPropertyInfo* propertyInfoPointer)
-    {
+    public static unsafe INativePropertyInfoStruct Wrap(Il2CppPropertyInfo* propertyInfoPointer) {
         return propertyInfoStructHandler.Wrap(propertyInfoPointer);
     }
 
-    public static int ParameterInfoSize()
-    {
+    public static int ParameterInfoSize() {
         return parameterInfoStructHandler.Size();
     }
 
     //Types
-    public static INativeTypeStruct NewType()
-    {
+    public static INativeTypeStruct NewType() {
         return typeStructHandler.CreateNewStruct();
     }
 
-    public static unsafe INativeTypeStruct Wrap(Il2CppTypeStruct* typePointer)
-    {
+    public static unsafe INativeTypeStruct Wrap(Il2CppTypeStruct* typePointer) {
         return typeStructHandler.Wrap(typePointer);
     }
 
-    public static int TypeSize()
-    {
+    public static int TypeSize() {
         return typeStructHandler.Size();
     }
 }

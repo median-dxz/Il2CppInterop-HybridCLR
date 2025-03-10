@@ -2,14 +2,12 @@
 
 namespace Il2CppInterop.Runtime.Runtime.VersionSpecific.PropertyInfo;
 
-public interface INativePropertyInfoStructHandler : INativeStructHandler
-{
+public interface INativePropertyInfoStructHandler : INativeStructHandler {
     INativePropertyInfoStruct CreateNewStruct();
     unsafe INativePropertyInfoStruct Wrap(Il2CppPropertyInfo* propertyInfoPointer);
 }
 
-public interface INativePropertyInfoStruct : INativeStruct
-{
+public interface INativePropertyInfoStruct : INativeStruct {
     unsafe Il2CppPropertyInfo* PropertyInfoPointer { get; }
 
     ref IntPtr Name { get; }

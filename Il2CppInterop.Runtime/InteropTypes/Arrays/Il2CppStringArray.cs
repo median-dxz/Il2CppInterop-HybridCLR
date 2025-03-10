@@ -3,23 +3,18 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Il2CppInterop.Runtime.InteropTypes.Arrays;
 
-public class Il2CppStringArray : Il2CppArrayBase<string>
-{
-    static Il2CppStringArray()
-    {
+public class Il2CppStringArray : Il2CppArrayBase<string> {
+    static Il2CppStringArray() {
         StaticCtorBody(typeof(Il2CppStringArray));
     }
 
-    public Il2CppStringArray(IntPtr pointer) : base(pointer)
-    {
+    public Il2CppStringArray(IntPtr pointer) : base(pointer) {
     }
 
-    public Il2CppStringArray(long size) : base(AllocateArray(size))
-    {
+    public Il2CppStringArray(long size) : base(AllocateArray(size)) {
     }
 
-    public Il2CppStringArray(string?[] arr) : base(AllocateArray(arr.Length))
-    {
+    public Il2CppStringArray(string?[] arr) : base(AllocateArray(arr.Length)) {
         for (var i = 0; i < arr.Length; i++)
             this[i] = arr[i];
     }
@@ -30,22 +25,19 @@ public class Il2CppStringArray : Il2CppArrayBase<string>
         set => *GetElementPointer(index) = IL2CPP.ManagedStringToIl2Cpp(value);
     }
 #nullable enable
-    private unsafe IntPtr* GetElementPointer(int index)
-    {
+    private unsafe IntPtr* GetElementPointer(int index) {
         ThrowIfIndexOutOfRange(index);
         return (IntPtr*)IntPtr.Add(ArrayStartPointer, index * IntPtr.Size).ToPointer();
     }
 
     [return: NotNullIfNotNull(nameof(arr))]
-    public static implicit operator Il2CppStringArray?(string?[]? arr)
-    {
+    public static implicit operator Il2CppStringArray?(string?[]? arr) {
         if (arr == null) return null;
 
         return new Il2CppStringArray(arr);
     }
 
-    private static IntPtr AllocateArray(long size)
-    {
+    private static IntPtr AllocateArray(long size) {
         if (size < 0)
             throw new ArgumentOutOfRangeException(nameof(size), "Array size must not be negative");
 

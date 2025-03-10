@@ -8,12 +8,10 @@ using BindingFlags = System.Reflection.BindingFlags;
 
 namespace Il2CppInterop.Runtime.XrefScans;
 
-internal class XrefScanImpl : IXrefScannerImpl
-{
+internal class XrefScanImpl : IXrefScannerImpl {
     private static Func<AppDomain, Il2CppReferenceArray<Assembly>>? getAssemblies;
 
-    public unsafe (XrefScanUtil.InitMetadataForMethod, IntPtr)? GetMetadataResolver()
-    {
+    public unsafe (XrefScanUtil.InitMetadataForMethod, IntPtr)? GetMetadataResolver() {
         getAssemblies ??=
             typeof(AppDomain).GetMethod("GetAssemblies", BindingFlags.Public | BindingFlags.Static)
                     ?.CreateDelegate(typeof(Func<AppDomain, Il2CppReferenceArray<Assembly>>)) as
@@ -30,11 +28,9 @@ internal class XrefScanImpl : IXrefScannerImpl
         return (ourMetadataInitForMethodDelegate, ourMetadataInitForMethodPointer);
     }
 
-    public bool XrefGlobalClassFilter(IntPtr movTarget)
-    {
+    public bool XrefGlobalClassFilter(IntPtr movTarget) {
         var valueAtMov = (IntPtr)Marshal.ReadInt64(movTarget);
-        if (valueAtMov != IntPtr.Zero)
-        {
+        if (valueAtMov != IntPtr.Zero) {
             var targetClass = (IntPtr)Marshal.ReadInt64(valueAtMov);
             return targetClass == Il2CppClassPointerStore<string>.NativeClassPtr ||
                    targetClass == Il2CppClassPointerStore<Type>.NativeClassPtr;

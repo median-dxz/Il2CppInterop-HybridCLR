@@ -2,14 +2,12 @@
 
 namespace Il2CppInterop.Runtime.Runtime.VersionSpecific.EventInfo;
 
-public interface INativeEventInfoStructHandler : INativeStructHandler
-{
+public interface INativeEventInfoStructHandler : INativeStructHandler {
     INativeEventInfoStruct CreateNewStruct();
     unsafe INativeEventInfoStruct Wrap(Il2CppEventInfo* eventInfoPointer);
 }
 
-public interface INativeEventInfoStruct : INativeStruct
-{
+public interface INativeEventInfoStruct : INativeStruct {
     unsafe Il2CppEventInfo* EventInfoPointer { get; }
 
     ref IntPtr Name { get; }

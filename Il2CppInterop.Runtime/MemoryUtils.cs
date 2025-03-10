@@ -4,10 +4,8 @@ using Il2CppInterop.Common.XrefScans;
 
 namespace Il2CppInterop.Runtime;
 
-internal class MemoryUtils
-{
-    public static nint FindSignatureInModule(ProcessModule module, SignatureDefinition sigDef)
-    {
+internal class MemoryUtils {
+    public static nint FindSignatureInModule(ProcessModule module, SignatureDefinition sigDef) {
         var ptr = FindSignatureInBlock(
             module.BaseAddress,
             module.ModuleMemorySize,
@@ -20,20 +18,16 @@ internal class MemoryUtils
         return ptr;
     }
 
-    public static nint FindSignatureInBlock(nint block, long blockSize, string pattern, string mask, long sigOffset = 0)
-    {
+    public static nint FindSignatureInBlock(nint block, long blockSize, string pattern, string mask, long sigOffset = 0) {
         return FindSignatureInBlock(block, blockSize, pattern.ToCharArray(), mask.ToCharArray(), sigOffset);
     }
 
     public static unsafe nint FindSignatureInBlock(nint block, long blockSize, char[] pattern, char[] mask,
-        long sigOffset = 0)
-    {
-        for (long address = 0; address < blockSize; address++)
-        {
+        long sigOffset = 0) {
+        for (long address = 0; address < blockSize; address++) {
             var found = true;
             for (uint offset = 0; offset < mask.Length; offset++)
-                if (*(byte*)(address + block + offset) != (byte)pattern[offset] && mask[offset] != '?')
-                {
+                if (*(byte*)(address + block + offset) != (byte)pattern[offset] && mask[offset] != '?') {
                     found = false;
                     break;
                 }
@@ -45,8 +39,7 @@ internal class MemoryUtils
         return 0;
     }
 
-    public struct SignatureDefinition
-    {
+    public struct SignatureDefinition {
         public string pattern;
         public string mask;
         public int offset;

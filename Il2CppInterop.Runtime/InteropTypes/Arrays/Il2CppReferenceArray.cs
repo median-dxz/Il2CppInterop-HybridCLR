@@ -5,19 +5,16 @@ using Il2CppInterop.Runtime.Runtime;
 
 namespace Il2CppInterop.Runtime.InteropTypes.Arrays;
 
-public class Il2CppReferenceArray<T> : Il2CppArrayBase<T> where T : Il2CppObjectBase?
-{
+public class Il2CppReferenceArray<T> : Il2CppArrayBase<T> where T : Il2CppObjectBase? {
     private static readonly int ourElementTypeSize;
     private static readonly bool ourElementIsValueType;
 
-    static Il2CppReferenceArray()
-    {
+    static Il2CppReferenceArray() {
         ourElementTypeSize = IntPtr.Size;
         var nativeClassPtr = Il2CppClassPointerStore<T>.NativeClassPtr;
         if (nativeClassPtr == IntPtr.Zero) return;
         uint align = 0;
-        if (IL2CPP.il2cpp_class_is_valuetype(nativeClassPtr))
-        {
+        if (IL2CPP.il2cpp_class_is_valuetype(nativeClassPtr)) {
             ourElementIsValueType = true;
             ourElementTypeSize = IL2CPP.il2cpp_class_value_size(nativeClassPtr, ref align);
         }
@@ -25,16 +22,13 @@ public class Il2CppReferenceArray<T> : Il2CppArrayBase<T> where T : Il2CppObject
         StaticCtorBody(typeof(Il2CppReferenceArray<T>));
     }
 
-    public Il2CppReferenceArray(IntPtr nativeObject) : base(nativeObject)
-    {
+    public Il2CppReferenceArray(IntPtr nativeObject) : base(nativeObject) {
     }
 
-    public Il2CppReferenceArray(long size) : base(AllocateArray(size))
-    {
+    public Il2CppReferenceArray(long size) : base(AllocateArray(size)) {
     }
 
-    public Il2CppReferenceArray(T[] arr) : base(AllocateArray(arr.Length))
-    {
+    public Il2CppReferenceArray(T[] arr) : base(AllocateArray(arr.Length)) {
         for (var i = 0; i < arr.Length; i++)
             this[i] = arr[i];
     }
@@ -45,24 +39,20 @@ public class Il2CppReferenceArray<T> : Il2CppArrayBase<T> where T : Il2CppObject
         set => StoreValue(GetElementPointer(index), value?.Pointer ?? IntPtr.Zero);
     }
 
-    private IntPtr GetElementPointer(int index)
-    {
+    private IntPtr GetElementPointer(int index) {
         ThrowIfIndexOutOfRange(index);
         return IntPtr.Add(ArrayStartPointer, index * ourElementTypeSize);
     }
 
     [return: NotNullIfNotNull(nameof(arr))]
-    public static implicit operator Il2CppReferenceArray<T>?(T[]? arr)
-    {
+    public static implicit operator Il2CppReferenceArray<T>?(T[]? arr) {
         if (arr == null) return null;
 
         return new Il2CppReferenceArray<T>(arr);
     }
 
-    private static unsafe void StoreValue(IntPtr targetPointer, IntPtr valuePointer)
-    {
-        if (ourElementIsValueType)
-        {
+    private static unsafe void StoreValue(IntPtr targetPointer, IntPtr valuePointer) {
+        if (ourElementIsValueType) {
             if (valuePointer == IntPtr.Zero)
                 throw new NullReferenceException();
 
@@ -70,15 +60,12 @@ public class Il2CppReferenceArray<T> : Il2CppArrayBase<T> where T : Il2CppObject
             var targetRawPointer = (byte*)targetPointer;
 
             Unsafe.CopyBlock(targetRawPointer, valueRawPointer, (uint)ourElementTypeSize);
-        }
-        else
-        {
+        } else {
             *(IntPtr*)targetPointer = valuePointer;
         }
     }
 
-    private static unsafe T? WrapElement(IntPtr memberPointer)
-    {
+    private static unsafe T? WrapElement(IntPtr memberPointer) {
         if (ourElementIsValueType)
             memberPointer = IL2CPP.il2cpp_value_box(Il2CppClassPointerStore<T>.NativeClassPtr, memberPointer);
         else
@@ -90,8 +77,7 @@ public class Il2CppReferenceArray<T> : Il2CppArrayBase<T> where T : Il2CppObject
         return Il2CppObjectPool.Get<T>(memberPointer);
     }
 
-    private static IntPtr AllocateArray(long size)
-    {
+    private static IntPtr AllocateArray(long size) {
         if (size < 0)
             throw new ArgumentOutOfRangeException(nameof(size), "Array size must not be negative");
 

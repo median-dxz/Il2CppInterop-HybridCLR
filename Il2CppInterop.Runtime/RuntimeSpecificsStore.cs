@@ -4,33 +4,26 @@ using System.Threading;
 
 namespace Il2CppInterop.Runtime;
 
-public static class RuntimeSpecificsStore
-{
+public static class RuntimeSpecificsStore {
     private static readonly ReaderWriterLockSlim Lock = new();
     private static readonly Dictionary<IntPtr, bool> WasInjectedStore = new();
 
-    public static bool IsInjected(IntPtr nativeClass)
-    {
+    public static bool IsInjected(IntPtr nativeClass) {
         Lock.EnterReadLock();
-        try
-        {
+        try {
             return WasInjectedStore.TryGetValue(nativeClass, out var result) && result;
         }
-        finally
-        {
+        finally {
             Lock.ExitReadLock();
         }
     }
 
-    public static void SetClassInfo(IntPtr nativeClass, bool wasInjected)
-    {
+    public static void SetClassInfo(IntPtr nativeClass, bool wasInjected) {
         Lock.EnterWriteLock();
-        try
-        {
+        try {
             WasInjectedStore[nativeClass] = wasInjected;
         }
-        finally
-        {
+        finally {
             Lock.ExitWriteLock();
         }
     }

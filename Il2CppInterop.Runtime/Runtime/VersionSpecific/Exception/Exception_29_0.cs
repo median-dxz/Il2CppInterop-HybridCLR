@@ -1,25 +1,20 @@
 using System;
 using System.Runtime.InteropServices;
-namespace Il2CppInterop.Runtime.Runtime.VersionSpecific.Exception
-{
+namespace Il2CppInterop.Runtime.Runtime.VersionSpecific.Exception {
     [ApplicableToUnityVersionsSince("2021.2.0")]
-    public unsafe class NativeExceptionStructHandler_29_0 : INativeExceptionStructHandler
-    {
+    public unsafe class NativeExceptionStructHandler_29_0 : INativeExceptionStructHandler {
         public int Size() => sizeof(Il2CppException_29_0);
-        public INativeExceptionStruct CreateNewStruct()
-        {
+        public INativeExceptionStruct CreateNewStruct() {
             IntPtr ptr = Marshal.AllocHGlobal(Size());
             Il2CppException_29_0* _ = (Il2CppException_29_0*)ptr;
             *_ = default;
             return new NativeStructWrapper(ptr);
         }
-        public INativeExceptionStruct Wrap(Il2CppException* ptr)
-        {
+        public INativeExceptionStruct? Wrap(Il2CppException* ptr) {
             if (ptr == null) return null;
             return new NativeStructWrapper((IntPtr)ptr);
         }
-        internal unsafe struct Il2CppException_29_0
-        {
+        internal unsafe struct Il2CppException_29_0 {
             public Il2CppObject _object;
             public Il2CppString* className;
             public Il2CppString* message;
@@ -39,8 +34,7 @@ namespace Il2CppInterop.Runtime.Runtime.VersionSpecific.Exception
             public int caught_in_unmanaged;
         }
 
-        internal class NativeStructWrapper : INativeExceptionStruct
-        {
+        internal class NativeStructWrapper : INativeExceptionStruct {
             public NativeStructWrapper(IntPtr ptr) => Pointer = ptr;
             public IntPtr Pointer { get; }
             private Il2CppException_29_0* _ => (Il2CppException_29_0*)Pointer;

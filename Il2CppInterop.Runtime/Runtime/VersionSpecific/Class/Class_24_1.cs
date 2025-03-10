@@ -1,26 +1,21 @@
 using System;
 using System.Runtime.InteropServices;
 using Il2CppInterop.Runtime.Runtime.VersionSpecific.Type;
-namespace Il2CppInterop.Runtime.Runtime.VersionSpecific.Class
-{
+namespace Il2CppInterop.Runtime.Runtime.VersionSpecific.Class {
     [ApplicableToUnityVersionsSince("2018.2.0")]
-    public unsafe class NativeClassStructHandler_24_1 : INativeClassStructHandler
-    {
+    public unsafe class NativeClassStructHandler_24_1 : INativeClassStructHandler {
         public int Size() => sizeof(Il2CppClass_24_1);
-        public INativeClassStruct CreateNewStruct(int vTableSlots)
-        {
+        public INativeClassStruct CreateNewStruct(int vTableSlots) {
             IntPtr ptr = Marshal.AllocHGlobal(Size() + sizeof(VirtualInvokeData) * vTableSlots);
             Il2CppClass_24_1* _ = (Il2CppClass_24_1*)ptr;
             *_ = default;
             return new NativeStructWrapper(ptr);
         }
-        public INativeClassStruct Wrap(Il2CppClass* ptr)
-        {
+        public INativeClassStruct? Wrap(Il2CppClass* ptr) {
             if (ptr == null) return null;
             return new NativeStructWrapper((IntPtr)ptr);
         }
-        internal unsafe struct Il2CppClass_24_1
-        {
+        internal unsafe struct Il2CppClass_24_1 {
             public Il2CppImage* image;
             public void* gc_desc;
             public byte* name;
@@ -75,8 +70,7 @@ namespace Il2CppInterop.Runtime.Runtime.VersionSpecific.Class
             public byte packingSize;
             public Bitfield0 _bitfield0;
             public Bitfield1 _bitfield1;
-            internal enum Bitfield0 : byte
-            {
+            internal enum Bitfield0 : byte {
                 BIT_valuetype = 0,
                 valuetype = (1 << BIT_valuetype),
                 BIT_initialized = 1,
@@ -95,8 +89,7 @@ namespace Il2CppInterop.Runtime.Runtime.VersionSpecific.Class
                 has_finalize = (1 << BIT_has_finalize),
             }
 
-            internal enum Bitfield1 : byte
-            {
+            internal enum Bitfield1 : byte {
                 BIT_has_cctor = 0,
                 has_cctor = (1 << BIT_has_cctor),
                 BIT_is_blittable = 1,
@@ -111,8 +104,7 @@ namespace Il2CppInterop.Runtime.Runtime.VersionSpecific.Class
 
         }
 
-        internal class NativeStructWrapper : INativeClassStruct
-        {
+        internal class NativeStructWrapper : INativeClassStruct {
             public NativeStructWrapper(IntPtr ptr) => Pointer = ptr;
             private static int _bitfield0offset = Marshal.OffsetOf<Il2CppClass_24_1>(nameof(Il2CppClass_24_1._bitfield0)).ToInt32();
             private static int _bitfield1offset = Marshal.OffsetOf<Il2CppClass_24_1>(nameof(Il2CppClass_24_1._bitfield1)).ToInt32();

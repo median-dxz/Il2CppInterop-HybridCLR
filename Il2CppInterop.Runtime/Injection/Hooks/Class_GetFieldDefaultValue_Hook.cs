@@ -10,20 +10,16 @@ using Il2CppInterop.Runtime.Runtime.VersionSpecific.FieldInfo;
 using Il2CppInterop.Runtime.Startup;
 using Microsoft.Extensions.Logging;
 
-namespace Il2CppInterop.Runtime.Injection.Hooks
-{
-    internal unsafe class Class_GetFieldDefaultValue_Hook : Hook<Class_GetFieldDefaultValue_Hook.MethodDelegate>
-    {
+namespace Il2CppInterop.Runtime.Injection.Hooks {
+    internal unsafe class Class_GetFieldDefaultValue_Hook : Hook<Class_GetFieldDefaultValue_Hook.MethodDelegate> {
         public override string TargetMethodName => "Class::GetDefaultFieldValue";
         public override MethodDelegate GetDetour() => Hook;
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         internal delegate byte* MethodDelegate(Il2CppFieldInfo* field, out Il2CppTypeStruct* type);
 
-        private byte* Hook(Il2CppFieldInfo* field, out Il2CppTypeStruct* type)
-        {
-            if (EnumInjector.GetDefaultValueOverride(field, out IntPtr newDefaultPtr))
-            {
+        private byte* Hook(Il2CppFieldInfo* field, out Il2CppTypeStruct* type) {
+            if (EnumInjector.GetDefaultValueOverride(field, out IntPtr newDefaultPtr)) {
                 INativeFieldInfoStruct wrappedField = UnityVersionHandler.Wrap(field);
                 INativeClassStruct wrappedParent = UnityVersionHandler.Wrap(wrappedField.Parent);
                 INativeClassStruct wrappedElementClass = UnityVersionHandler.Wrap(wrappedParent.ElementClass);
@@ -73,11 +69,9 @@ namespace Il2CppInterop.Runtime.Injection.Hooks
             },
         };
 
-        private static nint FindClassGetFieldDefaultValueXref(bool forceICallMethod = false)
-        {
+        private static nint FindClassGetFieldDefaultValueXref(bool forceICallMethod = false) {
             nint classGetDefaultFieldValue = 0;
-            if (forceICallMethod)
-            {
+            if (forceICallMethod) {
                 // MonoField isn't present on 2021.2.0+
                 var monoFieldType = InjectorHelpers.Il2CppMscorlib.GetTypesSafe().SingleOrDefault((x) => x.Name is "MonoField");
                 if (monoFieldType == null)
@@ -97,9 +91,7 @@ namespace Il2CppInterop.Runtime.Injection.Hooks
                 Logger.Instance.LogTrace("Field::GetValueObjectForThread: 0x{FieldGetValueObjectForThreadAddress}", fieldGetValueObjectForThread.ToInt64().ToString("X2"));
 
                 classGetDefaultFieldValue = XrefScannerLowLevel.JumpTargets(fieldGetValueObjectForThread).ElementAt(2);
-            }
-            else
-            {
+            } else {
                 var getStaticFieldValueAPI = InjectorHelpers.GetIl2CppExport(nameof(IL2CPP.il2cpp_field_static_get_value));
                 Logger.Instance.LogTrace("il2cpp_field_static_get_value: 0x{GetStaticFieldValueApiAddress}", getStaticFieldValueAPI.ToInt64().ToString("X2"));
 
@@ -118,8 +110,7 @@ namespace Il2CppInterop.Runtime.Injection.Hooks
             return classGetDefaultFieldValue;
         }
 
-        public override IntPtr FindTargetMethod()
-        {
+        public override IntPtr FindTargetMethod() {
             // NOTE: In some cases this pointer will be MetadataCache::GetFieldDefaultValueForField due to Field::GetDefaultFieldValue being
             // inlined but we'll treat it the same even though it doesn't receive the type parameter the RDX register
             // doesn't get cleared so we still get the same parameters
@@ -127,8 +118,7 @@ namespace Il2CppInterop.Runtime.Injection.Hooks
                 .Select(s => MemoryUtils.FindSignatureInModule(InjectorHelpers.Il2CppModule, s))
                 .FirstOrDefault(p => p != 0);
 
-            if (classGetDefaultFieldValue == 0)
-            {
+            if (classGetDefaultFieldValue == 0) {
                 Logger.Instance.LogTrace("Couldn't fetch Class::GetDefaultFieldValue with signatures, using method traversal");
                 classGetDefaultFieldValue = FindClassGetFieldDefaultValueXref();
             }

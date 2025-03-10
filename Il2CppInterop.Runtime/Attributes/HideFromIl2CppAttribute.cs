@@ -7,6 +7,5 @@ namespace Il2CppInterop.Runtime.Attributes;
 /// </summary>
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Constructor | AttributeTargets.Property |
                 AttributeTargets.Event)]
-public class HideFromIl2CppAttribute : Attribute
-{
+public class HideFromIl2CppAttribute : Attribute {
 }

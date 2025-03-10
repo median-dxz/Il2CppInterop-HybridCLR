@@ -3,18 +3,15 @@ using System.Runtime.InteropServices;
 
 namespace Il2CppInterop.Runtime.Runtime;
 
-public static class NativeStructUtils
-{
-    public static IntPtr GetMethodInfoForMissingMethod(string methodName)
-    {
+public static class NativeStructUtils {
+    public static IntPtr GetMethodInfoForMissingMethod(string methodName) {
         var methodInfo = UnityVersionHandler.NewMethod();
         methodInfo.Name = Marshal.StringToHGlobalAnsi(methodName);
         methodInfo.Slot = ushort.MaxValue;
         return methodInfo.Pointer;
     }
 
-    public static unsafe bool CheckBit(this INativeStruct self, int startOffset, int bit)
-    {
+    public static unsafe bool CheckBit(this INativeStruct self, int startOffset, int bit) {
         var byteOffset = bit / 8;
         var bitOffset = bit % 8;
         var p = self.Pointer + startOffset + byteOffset;
@@ -25,8 +22,7 @@ public static class NativeStructUtils
         return masked == mask;
     }
 
-    public static unsafe void SetBit(this INativeStruct self, int startOffset, int bit, bool value)
-    {
+    public static unsafe void SetBit(this INativeStruct self, int startOffset, int bit, bool value) {
         var byteOffset = bit / 8;
         var bitOffset = bit % 8;
         var p = self.Pointer + startOffset + byteOffset;

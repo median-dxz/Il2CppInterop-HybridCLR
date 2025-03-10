@@ -2,14 +2,12 @@ using System;
 
 namespace Il2CppInterop.Runtime.Runtime.VersionSpecific.MethodInfo;
 
-public interface INativeMethodInfoStructHandler : INativeStructHandler
-{
+public interface INativeMethodInfoStructHandler : INativeStructHandler {
     INativeMethodInfoStruct CreateNewStruct();
     unsafe INativeMethodInfoStruct Wrap(Il2CppMethodInfo* methodPointer);
 }
 
-public interface INativeMethodInfoStruct : INativeStruct
-{
+public interface INativeMethodInfoStruct : INativeStruct {
     unsafe Il2CppMethodInfo* MethodInfoPointer { get; }
     ref IntPtr Name { get; }
     ref ushort Slot { get; }

@@ -11,82 +11,64 @@ using System.Runtime.InteropServices;
 namespace Il2CppInterop.Runtime.Runtime;
 
 //Stub structs
-public struct Il2CppAssembly
-{
+public struct Il2CppAssembly {
 }
 
-public struct Il2CppClass
-{
+public struct Il2CppClass {
 }
 
-public struct Il2CppEventInfo
-{
+public struct Il2CppEventInfo {
 }
 
-public struct Il2CppException
-{
+public struct Il2CppException {
 }
 
-public struct Il2CppFieldInfo
-{
+public struct Il2CppFieldInfo {
 }
 
-public struct Il2CppImage
-{
+public struct Il2CppImage {
 }
 
-public struct Il2CppMethodInfo
-{
+public struct Il2CppMethodInfo {
 }
 
-public struct Il2CppParameterInfo
-{
+public struct Il2CppParameterInfo {
 }
 
-public struct Il2CppPropertyInfo
-{
+public struct Il2CppPropertyInfo {
 }
 
-public struct Il2CppTypeStruct
-{
+public struct Il2CppTypeStruct {
 }
 
-public struct Il2CppAssemblyName
-{
+public struct Il2CppAssemblyName {
 }
 
-public struct Il2CppString
-{
+public struct Il2CppString {
 }
 
-public struct Il2CppMetadataTypeHandle
-{
+public struct Il2CppMetadataTypeHandle {
     private readonly unsafe void* dummy;
 }
 
-public struct Il2CppMetadataGenericContainerHandle
-{
+public struct Il2CppMetadataGenericContainerHandle {
     private readonly unsafe void* dummy;
 }
 
-public struct Il2CppMetadataImageHandle
-{
+public struct Il2CppMetadataImageHandle {
     private readonly unsafe void* dummy;
 }
 
-public struct il2cpp_hresult_t
-{
+public struct il2cpp_hresult_t {
     private readonly int dummy;
 }
 
-public struct Il2CppGCHandle
-{
+public struct Il2CppGCHandle {
     private readonly unsafe void* dummy;
 }
 
 [Flags]
-public enum Il2CppMethodImplFlags : ushort
-{
+public enum Il2CppMethodImplFlags : ushort {
     METHOD_IMPL_ATTRIBUTE_CODE_TYPE_MASK = 0x0003,
     METHOD_IMPL_ATTRIBUTE_IL = 0x0000,
     METHOD_IMPL_ATTRIBUTE_NATIVE = 0x0001,
@@ -106,8 +88,7 @@ public enum Il2CppMethodImplFlags : ushort
 }
 
 [Flags]
-public enum Il2CppMethodFlags : ushort
-{
+public enum Il2CppMethodFlags : ushort {
     METHOD_ATTRIBUTE_MEMBER_ACCESS_MASK = 0x0007,
     METHOD_ATTRIBUTE_COMPILER_CONTROLLED = 0x0000,
     METHOD_ATTRIBUTE_PRIVATE = 0x0001,
@@ -143,8 +124,7 @@ public enum Il2CppMethodFlags : ushort
 }
 
 [Flags]
-public enum Il2CppClassAttributes : uint
-{
+public enum Il2CppClassAttributes : uint {
     TYPE_ATTRIBUTE_VISIBILITY_MASK = 0x00000007,
     TYPE_ATTRIBUTE_NOT_PUBLIC = 0x00000000,
     TYPE_ATTRIBUTE_PUBLIC = 0x00000001,
@@ -184,8 +164,7 @@ public enum Il2CppClassAttributes : uint
     TYPE_ATTRIBUTE_HAS_SECURITY = 0x00040000
 }
 
-public enum Il2CppTypeEnum : byte
-{
+public enum Il2CppTypeEnum : byte {
     IL2CPP_TYPE_END = 0x00, /* End of List */
     IL2CPP_TYPE_VOID = 0x01,
     IL2CPP_TYPE_BOOLEAN = 0x02,
@@ -231,28 +210,24 @@ public enum Il2CppTypeEnum : byte
 }
 
 [StructLayout(LayoutKind.Sequential)]
-public unsafe struct VirtualInvokeData
-{
+public unsafe struct VirtualInvokeData {
     public IntPtr methodPtr;
     public Il2CppMethodInfo* method;
 }
 
 [StructLayout(LayoutKind.Sequential)]
-public unsafe struct Il2CppRuntimeInterfaceOffsetPair
-{
+public unsafe struct Il2CppRuntimeInterfaceOffsetPair {
     public Il2CppClass* interfaceType;
     public int offset;
 }
 
 [StructLayout(LayoutKind.Sequential)]
-public struct Il2CppObject
-{
+public struct Il2CppObject {
     private readonly IntPtr data;
     private readonly IntPtr monitor;
 }
 
-public struct Il2CppImageGlobalMetadata
-{
+public struct Il2CppImageGlobalMetadata {
     public int typeStart;
     public int exportedTypeStart;
     public int customAttributeStart;
@@ -261,15 +236,13 @@ public struct Il2CppImageGlobalMetadata
 }
 
 [StructLayout(LayoutKind.Sequential)]
-public unsafe struct Il2CppGenericInst
-{
+public unsafe struct Il2CppGenericInst {
     public uint type_argc;
     public Il2CppTypeStruct** type_argv;
 }
 
 [StructLayout(LayoutKind.Sequential)]
-public unsafe struct Il2CppGenericContext
-{
+public unsafe struct Il2CppGenericContext {
     /* The instantiation corresponding to the class generic parameters */
     public Il2CppGenericInst* class_inst;
 
@@ -278,22 +251,19 @@ public unsafe struct Il2CppGenericContext
 }
 
 [StructLayout(LayoutKind.Sequential)]
-public unsafe struct Il2CppGenericClass
-{
+public unsafe struct Il2CppGenericClass {
     public int typeDefinitionIndex;
     public Il2CppGenericContext context;
     public Il2CppClass* cached_class;
 }
 
 [StructLayout(LayoutKind.Sequential)]
-public unsafe struct Il2CppGenericMethod
-{
+public unsafe struct Il2CppGenericMethod {
     public Il2CppMethodInfo* methodDefinition;
     public Il2CppGenericContext context;
 }
 
-public unsafe struct Il2CppReflectionMethod
-{
+public unsafe struct Il2CppReflectionMethod {
     public Il2CppObject _object;
     public Il2CppMethodInfo* method;
     public Il2CppString* name;

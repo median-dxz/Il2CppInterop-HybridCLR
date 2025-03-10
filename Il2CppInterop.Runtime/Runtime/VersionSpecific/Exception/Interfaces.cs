@@ -1,13 +1,11 @@
 ﻿namespace Il2CppInterop.Runtime.Runtime.VersionSpecific.Exception;
 
-public interface INativeExceptionStructHandler : INativeStructHandler
-{
+public interface INativeExceptionStructHandler : INativeStructHandler {
     INativeExceptionStruct CreateNewStruct();
     unsafe INativeExceptionStruct Wrap(Il2CppException* exceptionPointer);
 }
 
-public interface INativeExceptionStruct : INativeStruct
-{
+public interface INativeExceptionStruct : INativeStruct {
     unsafe Il2CppException* ExceptionPointer { get; }
 
     unsafe ref Il2CppException* InnerException { get; }

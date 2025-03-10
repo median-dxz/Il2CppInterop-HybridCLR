@@ -3,14 +3,12 @@ using Il2CppInterop.Runtime.Runtime.VersionSpecific.Type;
 
 namespace Il2CppInterop.Runtime.Runtime.VersionSpecific.Class;
 
-public interface INativeClassStructHandler : INativeStructHandler
-{
+public interface INativeClassStructHandler : INativeStructHandler {
     INativeClassStruct CreateNewStruct(int vTableSlots);
     unsafe INativeClassStruct Wrap(Il2CppClass* classPointer);
 }
 
-public interface INativeClassStruct : INativeStruct
-{
+public interface INativeClassStruct : INativeStruct {
     unsafe Il2CppClass* ClassPointer { get; }
     IntPtr VTable { get; }
 

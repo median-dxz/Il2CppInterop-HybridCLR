@@ -16,44 +16,36 @@ using Microsoft.Extensions.Logging;
 
 namespace Il2CppInterop.Runtime;
 
-public static unsafe class IL2CPP
-{
+public static unsafe class IL2CPP {
     private static readonly Dictionary<string, IntPtr> ourImagesMap = new();
 
-    static IL2CPP()
-    {
+    static IL2CPP() {
         var domain = il2cpp_domain_get();
-        if (domain == IntPtr.Zero)
-        {
+        if (domain == IntPtr.Zero) {
             Logger.Instance.LogError("No il2cpp domain found; sad!");
             return;
         }
 
         uint assembliesCount = 0;
         var assemblies = il2cpp_domain_get_assemblies(domain, ref assembliesCount);
-        for (var i = 0; i < assembliesCount; i++)
-        {
+        for (var i = 0; i < assembliesCount; i++) {
             var image = il2cpp_assembly_get_image(assemblies[i]);
             var name = Marshal.PtrToStringAnsi(il2cpp_image_get_name(image));
             ourImagesMap[name] = image;
         }
     }
 
-    internal static IntPtr GetIl2CppImage(string name)
-    {
+    internal static IntPtr GetIl2CppImage(string name) {
         if (ourImagesMap.ContainsKey(name)) return ourImagesMap[name];
         return IntPtr.Zero;
     }
 
-    internal static IntPtr[] GetIl2CppImages()
-    {
+    internal static IntPtr[] GetIl2CppImages() {
         return ourImagesMap.Values.ToArray();
     }
 
-    public static IntPtr GetIl2CppClass(string assemblyName, string namespaze, string className)
-    {
-        if (!ourImagesMap.TryGetValue(assemblyName, out var image))
-        {
+    public static IntPtr GetIl2CppClass(string assemblyName, string namespaze, string className) {
+        if (!ourImagesMap.TryGetValue(assemblyName, out var image)) {
             Logger.Instance.LogError("Assembly {AssemblyName} is not registered in il2cpp", assemblyName);
             return IntPtr.Zero;
         }
@@ -62,8 +54,7 @@ public static unsafe class IL2CPP
         return clazz;
     }
 
-    public static IntPtr GetIl2CppField(IntPtr clazz, string fieldName)
-    {
+    public static IntPtr GetIl2CppField(IntPtr clazz, string fieldName) {
         if (clazz == IntPtr.Zero) return IntPtr.Zero;
 
         var field = il2cpp_class_get_field_from_name(clazz, fieldName);
@@ -73,8 +64,7 @@ public static unsafe class IL2CPP
         return field;
     }
 
-    public static IntPtr GetIl2CppMethodByToken(IntPtr clazz, int token)
-    {
+    public static IntPtr GetIl2CppMethodByToken(IntPtr clazz, int token) {
         if (clazz == IntPtr.Zero)
             return NativeStructUtils.GetMethodInfoForMissingMethod(token.ToString());
 
@@ -91,15 +81,13 @@ public static unsafe class IL2CPP
     }
 
     public static IntPtr GetIl2CppMethod(IntPtr clazz, bool isGeneric, string methodName, string returnTypeName,
-        params string[] argTypes)
-    {
+        params string[] argTypes) {
         if (clazz == IntPtr.Zero)
             return NativeStructUtils.GetMethodInfoForMissingMethod(methodName + "(" + string.Join(", ", argTypes) +
                                                                    ")");
 
         returnTypeName = Regex.Replace(returnTypeName, "\\`\\d+", "").Replace('/', '.').Replace('+', '.');
-        for (var index = 0; index < argTypes.Length; index++)
-        {
+        for (var index = 0; index < argTypes.Length; index++) {
             var argType = argTypes[index];
             argTypes[index] = Regex.Replace(argType, "\\`\\d+", "").Replace('/', '.').Replace('+', '.');
         }
@@ -108,8 +96,7 @@ public static unsafe class IL2CPP
         var lastMethod = IntPtr.Zero;
         var iter = IntPtr.Zero;
         IntPtr method;
-        while ((method = il2cpp_class_get_methods(clazz, ref iter)) != IntPtr.Zero)
-        {
+        while ((method = il2cpp_class_get_methods(clazz, ref iter)) != IntPtr.Zero) {
             if (Marshal.PtrToStringAnsi(il2cpp_method_get_name(method)) != methodName)
                 continue;
 
@@ -128,12 +115,10 @@ public static unsafe class IL2CPP
             lastMethod = method;
 
             var badType = false;
-            for (var i = 0; i < argTypes.Length; i++)
-            {
+            for (var i = 0; i < argTypes.Length; i++) {
                 var paramType = il2cpp_method_get_param(method, (uint)i);
                 var typeName = Marshal.PtrToStringAnsi(il2cpp_type_get_name(paramType));
-                if (typeName != argTypes[i])
-                {
+                if (typeName != argTypes[i]) {
                     badType = true;
                     break;
                 }
@@ -146,15 +131,13 @@ public static unsafe class IL2CPP
 
         var className = Marshal.PtrToStringAnsi(il2cpp_class_get_name(clazz));
 
-        if (methodsSeen == 1)
-        {
+        if (methodsSeen == 1) {
             Logger.Instance.LogTrace(
                 "Method {ClassName}::{MethodName} was stubbed with a random matching method of the same name", className, methodName);
             Logger.Instance.LogTrace(
                 "Stubby return type/target: {LastMethod} / {ReturnTypeName}", Marshal.PtrToStringUTF8(il2cpp_type_get_name(il2cpp_method_get_return_type(lastMethod))), returnTypeName);
             Logger.Instance.LogTrace("Stubby parameter types/targets follow:");
-            for (var i = 0; i < argTypes.Length; i++)
-            {
+            for (var i = 0; i < argTypes.Length; i++) {
                 var paramType = il2cpp_method_get_param(lastMethod, (uint)i);
                 var typeName = Marshal.PtrToStringAnsi(il2cpp_type_get_name(paramType));
                 Logger.Instance.LogTrace("    {TypeName} / {ArgType}", typeName, argTypes[i]);
@@ -169,8 +152,7 @@ public static unsafe class IL2CPP
             Logger.Instance.LogTrace("    {ArgType}", argType);
         Logger.Instance.LogTrace("Available methods of this name follow:");
         iter = IntPtr.Zero;
-        while ((method = il2cpp_class_get_methods(clazz, ref iter)) != IntPtr.Zero)
-        {
+        while ((method = il2cpp_class_get_methods(clazz, ref iter)) != IntPtr.Zero) {
             if (Marshal.PtrToStringAnsi(il2cpp_method_get_name(method)) != methodName)
                 continue;
 
@@ -178,8 +160,7 @@ public static unsafe class IL2CPP
             Logger.Instance.LogTrace("Method starts");
             Logger.Instance.LogTrace(
                 "     return {MethodTypeName}", Marshal.PtrToStringUTF8(il2cpp_type_get_name(il2cpp_method_get_return_type(method))));
-            for (var i = 0; i < nParams; i++)
-            {
+            for (var i = 0; i < nParams; i++) {
                 var paramType = il2cpp_method_get_param(method, (uint)i);
                 var typeName = Marshal.PtrToStringAnsi(il2cpp_type_get_name(paramType));
                 Logger.Instance.LogTrace("    {TypeName}", typeName);
@@ -192,8 +173,7 @@ public static unsafe class IL2CPP
                                                                string.Join(", ", argTypes) + ")");
     }
 
-    public static string? Il2CppStringToManaged(IntPtr il2CppString)
-    {
+    public static string? Il2CppStringToManaged(IntPtr il2CppString) {
         if (il2CppString == IntPtr.Zero) return null;
 
         var length = il2cpp_string_length(il2CppString);
@@ -202,34 +182,28 @@ public static unsafe class IL2CPP
         return new string(chars, 0, length);
     }
 
-    public static IntPtr ManagedStringToIl2Cpp(string? str)
-    {
+    public static IntPtr ManagedStringToIl2Cpp(string? str) {
         if (str == null) return IntPtr.Zero;
 
-        fixed (char* chars = str)
-        {
+        fixed (char* chars = str) {
             return il2cpp_string_new_utf16(chars, str.Length);
         }
     }
 
-    public static IntPtr Il2CppObjectBaseToPtr(Il2CppObjectBase obj)
-    {
+    public static IntPtr Il2CppObjectBaseToPtr(Il2CppObjectBase obj) {
         return obj?.Pointer ?? IntPtr.Zero;
     }
 
-    public static IntPtr Il2CppObjectBaseToPtrNotNull(Il2CppObjectBase obj)
-    {
+    public static IntPtr Il2CppObjectBaseToPtrNotNull(Il2CppObjectBase obj) {
         return obj?.Pointer ?? throw new NullReferenceException();
     }
 
-    public static IntPtr GetIl2CppNestedType(IntPtr enclosingType, string nestedTypeName)
-    {
+    public static IntPtr GetIl2CppNestedType(IntPtr enclosingType, string nestedTypeName) {
         if (enclosingType == IntPtr.Zero) return IntPtr.Zero;
 
         var iter = IntPtr.Zero;
         IntPtr nestedTypePtr;
-        if (il2cpp_class_is_inflated(enclosingType))
-        {
+        if (il2cpp_class_is_inflated(enclosingType)) {
             Logger.Instance.LogTrace("Original class was inflated, falling back to reflection");
 
             return RuntimeReflectionHelper.GetNestedTypeViaReflection(enclosingType, nestedTypeName);
@@ -245,17 +219,14 @@ public static unsafe class IL2CPP
         return IntPtr.Zero;
     }
 
-    public static void ThrowIfNull(object arg)
-    {
+    public static void ThrowIfNull(object arg) {
         if (arg == null)
             throw new NullReferenceException();
     }
 
-    public static T ResolveICall<T>(string signature) where T : Delegate
-    {
+    public static T ResolveICall<T>(string signature) where T : Delegate {
         var icallPtr = il2cpp_resolve_icall(signature);
-        if (icallPtr == IntPtr.Zero)
-        {
+        if (icallPtr == IntPtr.Zero) {
             Logger.Instance.LogTrace("ICall {Signature} not resolved", signature);
             return GenerateDelegateForMissingICall<T>(signature);
         }
@@ -263,8 +234,7 @@ public static unsafe class IL2CPP
         return Marshal.GetDelegateForFunctionPointer<T>(icallPtr);
     }
 
-    private static T GenerateDelegateForMissingICall<T>(string signature) where T : Delegate
-    {
+    private static T GenerateDelegateForMissingICall<T>(string signature) where T : Delegate {
         var invoke = typeof(T).GetMethod("Invoke")!;
 
         var trampoline = new DynamicMethod("(missing icall delegate) " + typeof(T).FullName,
@@ -278,10 +248,8 @@ public static unsafe class IL2CPP
         return (T)trampoline.CreateDelegate(typeof(T));
     }
 
-    public static T? PointerToValueGeneric<T>(IntPtr objectPointer, bool isFieldPointer, bool valueTypeWouldBeBoxed)
-    {
-        if (isFieldPointer)
-        {
+    public static T? PointerToValueGeneric<T>(IntPtr objectPointer, bool isFieldPointer, bool valueTypeWouldBeBoxed) {
+        if (isFieldPointer) {
             if (il2cpp_class_is_valuetype(Il2CppClassPointerStore<T>.NativeClassPtr))
                 objectPointer = il2cpp_value_box(Il2CppClassPointerStore<T>.NativeClassPtr, objectPointer);
             else
@@ -303,21 +271,18 @@ public static unsafe class IL2CPP
         return Il2CppObjectPool.Get<T>(objectPointer);
     }
 
-    public static string RenderTypeName<T>(bool addRefMarker = false)
-    {
+    public static string RenderTypeName<T>(bool addRefMarker = false) {
         return RenderTypeName(typeof(T), addRefMarker);
     }
 
-    public static string RenderTypeName(Type t, bool addRefMarker = false)
-    {
+    public static string RenderTypeName(Type t, bool addRefMarker = false) {
         if (addRefMarker) return RenderTypeName(t) + "&";
         if (t.IsArray) return RenderTypeName(t.GetElementType()) + "[]";
         if (t.IsByRef) return RenderTypeName(t.GetElementType()) + "&";
         if (t.IsPointer) return RenderTypeName(t.GetElementType()) + "*";
         if (t.IsGenericParameter) return t.Name;
 
-        if (t.IsGenericType)
-        {
+        if (t.IsGenericType) {
             if (t.TypeHasIl2CppArrayBase())
                 return RenderTypeName(t.GetGenericArguments()[0]) + "[]";
 
@@ -325,8 +290,7 @@ public static unsafe class IL2CPP
             builder.Append(t.GetGenericTypeDefinition().FullNameObfuscated().TrimIl2CppPrefix());
             builder.Append('<');
             var genericArguments = t.GetGenericArguments();
-            for (var i = 0; i < genericArguments.Length; i++)
-            {
+            for (var i = 0; i < genericArguments.Length; i++) {
                 if (i != 0) builder.Append(',');
                 builder.Append(RenderTypeName(genericArguments[i]));
             }
@@ -341,20 +305,17 @@ public static unsafe class IL2CPP
         return t.FullNameObfuscated().TrimIl2CppPrefix();
     }
 
-    private static string FullNameObfuscated(this Type t)
-    {
+    private static string FullNameObfuscated(this Type t) {
         var obfuscatedNameAnnotations = t.GetCustomAttribute<ObfuscatedNameAttribute>();
         if (obfuscatedNameAnnotations == null) return t.FullName;
         return obfuscatedNameAnnotations.ObfuscatedName;
     }
 
-    private static string TrimIl2CppPrefix(this string s)
-    {
+    private static string TrimIl2CppPrefix(this string s) {
         return s.StartsWith("Il2Cpp") ? s.Substring("Il2Cpp".Length) : s;
     }
 
-    private static bool TypeHasIl2CppArrayBase(this Type type)
-    {
+    private static bool TypeHasIl2CppArrayBase(this Type type) {
         if (type == null) return false;
         if (type.IsConstructedGenericType) type = type.GetGenericTypeDefinition();
         if (type == typeof(Il2CppArrayBase<>)) return true;
@@ -363,8 +324,7 @@ public static unsafe class IL2CPP
 
     // this is called if there's no actual il2cpp_gc_wbarrier_set_field()
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void FieldWriteWbarrierStub(IntPtr obj, IntPtr targetAddress, IntPtr value)
-    {
+    public static void FieldWriteWbarrierStub(IntPtr obj, IntPtr targetAddress, IntPtr value) {
         // ignore obj
         *(IntPtr*)targetAddress = value;
     }
@@ -720,8 +680,7 @@ public static unsafe class IL2CPP
     public static extern IntPtr il2cpp_method_get_name(IntPtr method);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static IntPtr il2cpp_method_get_from_reflection(IntPtr method)
-    {
+    public static IntPtr il2cpp_method_get_from_reflection(IntPtr method) {
         if (UnityVersionHandler.HasGetMethodFromReflection) return _il2cpp_method_get_from_reflection(method);
         Il2CppReflectionMethod* reflectionMethod = (Il2CppReflectionMethod*)method;
         return (IntPtr)reflectionMethod->method;

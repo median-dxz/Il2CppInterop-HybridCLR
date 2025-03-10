@@ -8,16 +8,14 @@ using Il2CppInterop.Runtime.Runtime;
 
 namespace Il2CppInterop.Runtime.InteropTypes;
 
-public class Il2CppObjectBase
-{
+public class Il2CppObjectBase {
     private static readonly MethodInfo _unboxMethod = typeof(Il2CppObjectBase).GetMethod(nameof(Unbox));
     internal bool isWrapped;
     internal IntPtr pooledPtr;
 
     private nint myGcHandle;
 
-    public Il2CppObjectBase(IntPtr pointer)
-    {
+    public Il2CppObjectBase(IntPtr pointer) {
         CreateGCHandle(pointer);
     }
 
@@ -44,8 +42,7 @@ public class Il2CppObjectBase
         }
     }
 
-    internal void CreateGCHandle(IntPtr objHdl)
-    {
+    internal void CreateGCHandle(IntPtr objHdl) {
         if (objHdl == IntPtr.Zero)
             throw new NullReferenceException();
 
@@ -56,14 +53,12 @@ public class Il2CppObjectBase
         myGcHandle = IL2CPP.il2cpp_gchandle_new(objHdl, false);
     }
 
-    public T Cast<T>() where T : Il2CppObjectBase
-    {
+    public T Cast<T>() where T : Il2CppObjectBase {
         return TryCast<T>() ?? throw new InvalidCastException(
             $"Can't cast object of type {Marshal.PtrToStringAnsi(IL2CPP.il2cpp_class_get_name(IL2CPP.il2cpp_object_get_class(Pointer)))} to type {typeof(T)}");
     }
 
-    internal static unsafe T UnboxUnsafe<T>(IntPtr pointer)
-    {
+    internal static unsafe T UnboxUnsafe<T>(IntPtr pointer) {
         var nestedTypeClassPointer = Il2CppClassPointerStore<T>.NativeClassPtr;
         if (nestedTypeClassPointer == IntPtr.Zero)
             throw new ArgumentException($"{typeof(T)} is not an Il2Cpp reference type");
@@ -76,8 +71,7 @@ public class Il2CppObjectBase
         return Unsafe.AsRef<T>(IL2CPP.il2cpp_object_unbox(pointer).ToPointer());
     }
 
-    public T Unbox<T>() where T : unmanaged
-    {
+    public T Unbox<T>() where T : unmanaged {
         return UnboxUnsafe<T>(Pointer);
     }
 
@@ -87,12 +81,10 @@ public class Il2CppObjectBase
     private static readonly MethodInfo _createGCHandle = typeof(Il2CppObjectBase).GetMethod(nameof(CreateGCHandle), BindingFlags.Instance | BindingFlags.NonPublic)!;
     private static readonly FieldInfo _isWrapped = typeof(Il2CppObjectBase).GetField(nameof(isWrapped), BindingFlags.Instance | BindingFlags.NonPublic)!;
 
-    internal static class InitializerStore<T>
-    {
+    internal static class InitializerStore<T> {
         private static Func<IntPtr, T>? _initializer;
 
-        private static Func<IntPtr, T> Create()
-        {
+        private static Func<IntPtr, T> Create() {
             var type = Il2CppClassPointerStore<T>.CreatedTypeRedirect ?? typeof(T);
 
             var dynamicMethod = new DynamicMethod($"Initializer<{typeof(T).AssemblyQualifiedName}>", type, _intPtrTypeArray);
@@ -100,14 +92,11 @@ public class Il2CppObjectBase
 
             var il = dynamicMethod.GetILGenerator();
 
-            if (type.GetConstructor(new[] { typeof(IntPtr) }) is { } pointerConstructor)
-            {
+            if (type.GetConstructor(new[] { typeof(IntPtr) }) is { } pointerConstructor) {
                 // Base case: Il2Cpp constructor => call it directly
                 il.Emit(OpCodes.Ldarg_0);
                 il.Emit(OpCodes.Newobj, pointerConstructor);
-            }
-            else
-            {
+            } else {
                 // Special case: We have a parameterless constructor
                 // However, it could be be user-made or implicit
                 // In that case we set the GCHandle and then call the ctor and let GC destroy any objects created by DerivedConstructorPointer
@@ -129,8 +118,7 @@ public class Il2CppObjectBase
                 il.Emit(OpCodes.Stfld, _isWrapped);
 
                 var parameterlessConstructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, Type.EmptyTypes);
-                if (parameterlessConstructor != null)
-                {
+                if (parameterlessConstructor != null) {
                     // obj..ctor();
                     il.Emit(OpCodes.Dup);
                     il.Emit(OpCodes.Ldarg_0);
@@ -146,8 +134,7 @@ public class Il2CppObjectBase
         public static Func<IntPtr, T> Initializer => _initializer ??= Create();
     }
 
-    public T? TryCast<T>() where T : Il2CppObjectBase
-    {
+    public T? TryCast<T>() where T : Il2CppObjectBase {
         var nestedTypeClassPointer = Il2CppClassPointerStore<T>.NativeClassPtr;
         if (nestedTypeClassPointer == IntPtr.Zero)
             throw new ArgumentException($"{typeof(T)} is not an Il2Cpp reference type");
@@ -156,16 +143,14 @@ public class Il2CppObjectBase
         if (!IL2CPP.il2cpp_class_is_assignable_from(nestedTypeClassPointer, ownClass))
             return null;
 
-        if (RuntimeSpecificsStore.IsInjected(ownClass))
-        {
+        if (RuntimeSpecificsStore.IsInjected(ownClass)) {
             if (ClassInjectorBase.GetMonoObjectFromIl2CppPointer(Pointer) is T monoObject) return monoObject;
         }
 
         return InitializerStore<T>.Initializer(Pointer);
     }
 
-    ~Il2CppObjectBase()
-    {
+    ~Il2CppObjectBase() {
         IL2CPP.il2cpp_gchandle_free(myGcHandle);
 
         if (pooledPtr == IntPtr.Zero) return;

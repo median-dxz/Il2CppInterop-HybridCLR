@@ -14,25 +14,21 @@ using Type = System.Type;
 
 namespace Il2CppInterop.Runtime.Injection;
 
-public static unsafe class EnumInjector
-{
+public static unsafe class EnumInjector {
     // fieldInfo : defaultValueBlob
     private static readonly ConcurrentDictionary<IntPtr, IntPtr> s_DefaultValueOverrides = new();
 
     private static readonly IntPtr value__Cached = Marshal.StringToHGlobalAnsi("value__");
 
-    internal static bool GetDefaultValueOverride(Il2CppFieldInfo* fieldInfo, out IntPtr defaultValueBlob)
-    {
+    internal static bool GetDefaultValueOverride(Il2CppFieldInfo* fieldInfo, out IntPtr defaultValueBlob) {
         return s_DefaultValueOverrides.TryGetValue((IntPtr)fieldInfo, out defaultValueBlob);
     }
 
-    public static void InjectEnumValues<TEnum>(Dictionary<string, object> valuesToAdd) where TEnum : Enum
-    {
+    public static void InjectEnumValues<TEnum>(Dictionary<string, object> valuesToAdd) where TEnum : Enum {
         InjectEnumValues(typeof(TEnum), valuesToAdd);
     }
 
-    public static void InjectEnumValues(Type type, Dictionary<string, object> valuesToAdd)
-    {
+    public static void InjectEnumValues(Type type, Dictionary<string, object> valuesToAdd) {
         if (type == null)
             throw new ArgumentException("Type argument cannot be null");
         if (!type.IsEnum)
@@ -51,8 +47,7 @@ public static unsafe class EnumInjector
         var newFields = (Il2CppFieldInfo*)Marshal.AllocHGlobal(newFieldCount * UnityVersionHandler.FieldInfoSize());
 
         int fieldIdx;
-        for (fieldIdx = 0; fieldIdx < il2cppEnum.FieldCount; ++fieldIdx)
-        {
+        for (fieldIdx = 0; fieldIdx < il2cppEnum.FieldCount; ++fieldIdx) {
             var offset = fieldIdx * UnityVersionHandler.FieldInfoSize();
             var oldField = UnityVersionHandler.Wrap(il2cppEnum.Fields + offset);
             var newField = UnityVersionHandler.Wrap(newFields + offset);
@@ -69,8 +64,7 @@ public static unsafe class EnumInjector
 
         var enumElementType = UnityVersionHandler.Wrap(il2cppEnum.ElementClass).ByValArg;
 
-        foreach (var newData in valuesToAdd)
-        {
+        foreach (var newData in valuesToAdd) {
             var offset = fieldIdx * UnityVersionHandler.FieldInfoSize();
             var newField = UnityVersionHandler.Wrap(newFields + offset);
             newField.Name = Marshal.StringToHGlobalAnsi(newData.Key);
@@ -92,8 +86,7 @@ public static unsafe class EnumInjector
             runtimeEnumType.GenericCache = null;
     }
 
-    private static int GetEnumElementSize(Il2CppTypeEnum type)
-    {
+    private static int GetEnumElementSize(Il2CppTypeEnum type) {
         return type switch
         {
             Il2CppTypeEnum.IL2CPP_TYPE_I1 => sizeof(sbyte),
@@ -114,20 +107,17 @@ public static unsafe class EnumInjector
         };
     }
 
-    private static IntPtr AllocateNewDefaultValueBlob(Il2CppTypeEnum type)
-    {
+    private static IntPtr AllocateNewDefaultValueBlob(Il2CppTypeEnum type) {
         var size = GetEnumElementSize(type);
         var blob = Marshal.AllocHGlobal(size);
         Logger.Instance.LogTrace("Allocated default value blob at 0x{Blob} of {Size} for {Type}", blob.ToInt64().ToString("X2"), size, type);
         return blob;
     }
 
-    private static IntPtr CreateOrUpdateFieldDefaultValue(Il2CppFieldInfo* field, Il2CppTypeStruct* type, object value)
-    {
+    private static IntPtr CreateOrUpdateFieldDefaultValue(Il2CppFieldInfo* field, Il2CppTypeStruct* type, object value) {
         var typeEnum = UnityVersionHandler.Wrap(type).Type;
 
-        if (!GetDefaultValueOverride(field, out var newBlob))
-        {
+        if (!GetDefaultValueOverride(field, out var newBlob)) {
             newBlob = AllocateNewDefaultValueBlob(typeEnum);
             s_DefaultValueOverrides[(IntPtr)field] = newBlob;
         }
@@ -136,11 +126,9 @@ public static unsafe class EnumInjector
         return newBlob;
     }
 
-    private static void SetFieldDefaultValue(IntPtr blob, Il2CppTypeEnum type, object value)
-    {
+    private static void SetFieldDefaultValue(IntPtr blob, Il2CppTypeEnum type, object value) {
         var valueData = Convert.ToInt64(value);
-        switch (type)
-        {
+        switch (type) {
             case Il2CppTypeEnum.IL2CPP_TYPE_I1:
                 *(sbyte*)blob = (sbyte)valueData;
                 break;
@@ -177,13 +165,11 @@ public static unsafe class EnumInjector
         }
     }
 
-    public static void RegisterEnumInIl2Cpp<TEnum>(bool logSuccess = true) where TEnum : Enum
-    {
+    public static void RegisterEnumInIl2Cpp<TEnum>(bool logSuccess = true) where TEnum : Enum {
         RegisterEnumInIl2Cpp(typeof(TEnum), logSuccess);
     }
 
-    public static void RegisterEnumInIl2Cpp(Type type, bool logSuccess = true)
-    {
+    public static void RegisterEnumInIl2Cpp(Type type, bool logSuccess = true) {
         if (type == null)
             throw new ArgumentException("Type argument cannot be null");
 
@@ -267,8 +253,7 @@ public static unsafe class EnumInjector
         enumConstType.ByRef = false;
         enumConstType.Pinned = false;
 
-        for (var i = 1; i < il2cppEnum.FieldCount; i++)
-        {
+        for (var i = 1; i < il2cppEnum.FieldCount; i++) {
             var fieldValue = enumValues.GetValue(i - 1);
             var il2cppField = UnityVersionHandler.Wrap(il2cppFields + i * UnityVersionHandler.FieldInfoSize());
             il2cppField.Name = Marshal.StringToHGlobalAnsi(enumNames[i - 1]);

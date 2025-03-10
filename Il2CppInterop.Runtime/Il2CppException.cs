@@ -3,22 +3,18 @@ using System.Text;
 
 namespace Il2CppInterop.Runtime;
 
-public class Il2CppException : Exception
-{
-    [ThreadStatic] private static byte[] ourMessageBytes;
+public class Il2CppException : Exception {
+    [ThreadStatic] private static byte[]? ourMessageBytes;
 
-    public static Func<IntPtr, string> ParseMessageHook;
+    public static Func<IntPtr, string>? ParseMessageHook;
 
-    public Il2CppException(IntPtr exception) : base(BuildMessage(exception))
-    {
+    public Il2CppException(IntPtr exception) : base(BuildMessage(exception)) {
     }
 
-    private static unsafe string BuildMessage(IntPtr exception)
-    {
+    private static unsafe string BuildMessage(IntPtr exception) {
         if (ParseMessageHook != null) return ParseMessageHook(exception);
         ourMessageBytes ??= new byte[65536];
-        fixed (byte* message = ourMessageBytes)
-        {
+        fixed (byte* message = ourMessageBytes) {
             IL2CPP.il2cpp_format_exception(exception, message, ourMessageBytes.Length);
         }
 
@@ -30,8 +26,7 @@ public class Il2CppException : Exception
                "--- END IL2CPP STACK TRACE ---\n";
     }
 
-    public static void RaiseExceptionIfNecessary(IntPtr returnedException)
-    {
+    public static void RaiseExceptionIfNecessary(IntPtr returnedException) {
         if (returnedException == IntPtr.Zero) return;
         throw new Il2CppException(returnedException);
     }

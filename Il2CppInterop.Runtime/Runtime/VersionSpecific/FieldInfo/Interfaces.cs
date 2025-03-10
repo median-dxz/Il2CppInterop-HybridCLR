@@ -2,14 +2,12 @@
 
 namespace Il2CppInterop.Runtime.Runtime.VersionSpecific.FieldInfo;
 
-public interface INativeFieldInfoStructHandler : INativeStructHandler
-{
+public interface INativeFieldInfoStructHandler : INativeStructHandler {
     INativeFieldInfoStruct CreateNewStruct();
     unsafe INativeFieldInfoStruct Wrap(Il2CppFieldInfo* fieldInfoPointer);
 }
 
-public interface INativeFieldInfoStruct : INativeStruct
-{
+public interface INativeFieldInfoStruct : INativeStruct {
     unsafe Il2CppFieldInfo* FieldInfoPointer { get; }
 
     ref IntPtr Name { get; }
