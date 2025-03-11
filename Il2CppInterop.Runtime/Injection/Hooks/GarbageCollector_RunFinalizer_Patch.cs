@@ -53,6 +53,14 @@ internal class GarbageCollector_RunFinalizer_Patch : Hook<GarbageCollector_RunFi
             pattern = "\x48\x89\x5C\x24\x10\x48\x89\x74\x24\x18\x57\x48\x83\xEC\x20\x48\x8B\x19",
             mask = "xxxxxxxxxxxxxxxxxx",
             xref = false,
+        },
+        new()
+        {
+            // NewSeer - 2022.3.51 (x64, with HybridCLR)
+            //pattern = "48 89 54 24 10 48 89 4C 24 08 57 48 83 EC 60"
+            pattern = "\x48\x89\x54\x24\x10\x48\x89\x4C\x24\x08\x57\x48\x83\xEC\x60",
+            mask = "xxxxxxxxxxxxxxx",
+            xref = false,
         }
     };
 
