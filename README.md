@@ -12,9 +12,11 @@
 
 ***
 
-> **BepInEx fork of Il2CppAssemblyUnhollower is now Il2CppInterop!**
->
-> Looking for old README and guides? Check out [`legacy-unhollower` branch](https://github.com/BepInEx/Il2CppInterop/tree/legacy-unhollower).
+> **A fork of BeplnEx Il2CppInterop**
+
+该fork为SEA-Project进行了定制，主要是为了支持HybridCLR对Il2Cpp的修改，请留意该项目的特化性。
+
+This fork has been specifically customized for the SEA-Project, primarily to support HybridCLR's modified Il2Cpp Runtime. Please be aware of the project's specific adaptations.
 
 Il2CppInterop is a framework for bridging together Unity's Il2Cpp and .NET's CoreCLR runtimes. The framework various interoperability tools:
 
